@@ -111,17 +111,25 @@ struct MediaDetail: Codable {
         seasonInfo = try container.decodeIfPresent([SeasonInfo].self, forKey: .seasonInfo)
         
         // 添加解码日志
+        print("📊 [MediaDetail] ========== 季度数据解码 ==========")
         if let seasons = seasons {
             print("✅ [MediaDetail] seasons 解码成功，包含 \(seasons.count) 个季度")
+            for (season, episodes) in seasons {
+                print("   季 \(season): \(episodes.count) 集 - \(episodes)")
+            }
         } else {
             print("❌ [MediaDetail] seasons 解码失败或为 nil")
         }
         
         if let seasonInfo = seasonInfo {
             print("✅ [MediaDetail] seasonInfo 解码成功，包含 \(seasonInfo.count) 条记录")
+            for info in seasonInfo {
+                print("   季 \(info.seasonNumber ?? 0): \(info.name ?? "N/A") - \(info.episodeCount ?? 0) 集")
+            }
         } else {
             print("❌ [MediaDetail] seasonInfo 解码失败或为 nil")
         }
+        print("📊 [MediaDetail] ========== 解码完成 ==========")
     }
     
     var posterURL: URL? {

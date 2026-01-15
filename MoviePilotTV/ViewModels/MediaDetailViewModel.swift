@@ -307,28 +307,67 @@ class MediaDetailViewModel: ObservableObject {
     }
 
     func loadEpisodes(tmdbId: Int, seasonNumber: Int) async {
-        print("🔵 [MediaDetailVM] 加载剧集列表 - tmdbId: \(tmdbId), season: \(seasonNumber)")
+        print("🔵 [MediaDetailVM] ========== 加载剧集列表 ==========")
+        print("🔵 [MediaDetailVM] tmdbId: \(tmdbId), season: \(seasonNumber)")
         isLoadingEpisodes = true
         defer { isLoadingEpisodes = false }
-        let existing = mediaDetail?.seasons?[String(seasonNumber)] ?? []
-        let countFromInfo = mediaDetail?.seasonInfo?.first(where: { $0.seasonNumber == seasonNumber })?.episodeCount ?? 0
-        let maxNumber = max(existing.max() ?? 0, countFromInfo)
-        let total = max(maxNumber, existing.count)
-        let numbers: [Int]
-        if total > 0 {
-            numbers = Array(1...total)
-        } else {
-            numbers = []
+        
+        do {
+            // 调用新的 API 获取完整的剧集详情
+            print("📡 [MediaDetailVM] 开始调用 API 获取剧集详情...")
+            let episodeDetails = try await apiService.getEpisodeDetails(tmdbId: tmdbId, seasonNumber: seasonNumber)
+            print("✅ [MediaDetailVM] API 返回了 \(episodeDetails.count) 个剧集")
+            
+            // 转换为 Episode 模型
+            episodes = episodeDetails.map { detail in
+                Episode(
+                    episodeNumber: detail.episodeNumber,
+                    name: detail.name,
+                    overview: detail.overview,
+                    airDate: detail.airDate,
+                    stillPath: detail.stillPath
+                )
+            }
+            
+            print("✅ [MediaDetailVM] 成功加载 \(episodes.count) 个剧集")
+            if !episodes.isEmpty {
+                let first = episodes[0]
+                print("   示例 - 第\(first.episodeNumber)集: \(first.name)")
+                print("     海报: \(first.stillPath ?? "无")")
+                print("     简介: \(first.overview?.prefix(50) ?? "无")...")
+            }
+            
+        } catch {
+            print("❌ [MediaDetailVM] 获取剧集详情失败: \(error)")
+            
+            // 失败时生成占位数据
+            print("⚠️ [MediaDetailVM] 使用占位数据作为后备方案")
+            let existing = mediaDetail?.seasons?[String(seasonNumber)] ?? []
+            let countFromInfo = mediaDetail?.seasonInfo?.first(where: { $0.seasonNumber == seasonNumber })?.episodeCount ?? 0
+            let maxNumber = max(existing.max() ?? 0, countFromInfo)
+            let total = max(maxNumber, existing.count)
+            
+            let numbers: [Int]
+            if total > 0 {
+                numbers = Array(1...total)
+            } else {
+                numbers = []
+                print("⚠️ [MediaDetailVM] total 为 0，无法生成剧集列表")
+            }
+            
+            episodes = numbers.map { number in
+                Episode(
+                    episodeNumber: number,
+                    name: "第 \(number) 集",
+                    overview: nil,
+                    airDate: nil,
+                    stillPath: nil
+                )
+            }
+            print("⚠️ [MediaDetailVM] 生成了 \(episodes.count) 个占位剧集")
         }
-        episodes = numbers.map { number in
-            Episode(
-                episodeNumber: number,
-                name: "第 \(number) 集",
-                overview: nil,
-                airDate: nil,
-                stillPath: nil
-            )
-        }
+        
+        print("🔵 [MediaDetailVM] ========== 剧集列表加载完成 ==========")
     }
 
     func toggleSeasonSubscription(seasonNumber: Int, isCurrentlySubscribed: Bool) async {
