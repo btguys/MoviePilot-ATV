@@ -100,15 +100,20 @@ class APIService {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(authManager.accessToken)", forHTTPHeaderField: "Authorization")
         
-        print("   Token: \(authManager.accessToken.prefix(20))...")
+        // 检查 token 是否为空
+        if authManager.accessToken.isEmpty {
+            print("⚠️ [APIService] Access Token 为空！")
+        } else {
+            request.setValue("Bearer \(authManager.accessToken)", forHTTPHeaderField: "Authorization")
+            print("   Token: \(authManager.accessToken.prefix(20))...")
+        }
         
         return request
     }
     
     private func performRequest<T: Decodable>(_ request: URLRequest) async throws -> T {
-        print("📡 [APIService] 发送请求: \(request.url?.absoluteString ?? "unknown")")
+        print("📡 [APIService] 发送请求: \(request.httpMethod ?? "UNKNOWN") \(request.url?.absoluteString ?? "unknown")")
         
         do {
             let (data, response) = try await urlSession.data(for: request)
@@ -119,6 +124,16 @@ class APIService {
             }
             
             print("   HTTP Status: \(httpResponse.statusCode)")
+            
+            // 检查是否是认证失败 (401 或 403)
+            if httpResponse.statusCode == 401 {
+                print("⚠️ [APIService] 未认证 (401) - Token 可能无效或已过期")
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("   响应内容: \(responseString)")
+                }
+                authManager.handleTokenExpired()
+                throw APIError.tokenExpired
+            }
             
             // 检查是否是 token 过期 (403 + {"detail":"token校验不通过"})
             if httpResponse.statusCode == 403 {
@@ -239,12 +254,33 @@ class APIService {
         if let type = type {
             endpoint += "?type=\(type)"
         }
-        let request = try createRequest(endpoint: endpoint)
-        return try await performRequest(request)
+        print("🔵 [APIService] 获取订阅列表: \(endpoint)")
+        var request = try createRequest(endpoint: endpoint)
+        
+        // 禁用缓存，确保获取最新数据
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        
+        // 打印请求详情确认是GET
+        print("🔵 [APIService] 创建请求: \(request.httpMethod ?? "UNKNOWN") \(request.url?.absoluteString ?? "UNKNOWN")")
+        
+        // 尝试两种解析方式：直接数组或包装格式
+        do {
+            // 先尝试直接解析为数组
+            let subscriptions: [Subscription] = try await performRequest(request)
+            print("✅ [APIService] 成功获取 \(subscriptions.count) 个订阅（直接数组格式）")
+            return subscriptions
+        } catch {
+            print("⚠️ [APIService] 直接数组解析失败，尝试包装格式")
+            // 如果失败，尝试包装格式
+            let response: MoviePilotResponse<[Subscription]> = try await performRequest(request)
+            let subscriptions = response.data ?? []
+            print("✅ [APIService] 成功获取 \(subscriptions.count) 个订阅（包装格式）")
+            return subscriptions
+        }
     }
     
     func addSubscription(tmdbId: Int, name: String, year: Int?, type: String, season: Int?) async throws {
-        var request = try createRequest(endpoint: "/api/v1/subscribe", method: "POST")
+        var request = try createRequest(endpoint: "/api/v1/subscribe/", method: "POST")
         
         var body: [String: Any] = [
             "tmdbid": tmdbId,
@@ -260,12 +296,36 @@ class APIService {
         
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         
-        let _: EmptyResponse = try await performRequest(request)
+        // 订阅API返回包装格式
+        struct SubscribeResponseData: Codable {
+            let id: Int
+        }
+        let _: MoviePilotResponse<SubscribeResponseData> = try await performRequest(request)
     }
     
     // 新增：支持豆瓣和TMDB的通用订阅方法
     func subscribe(name: String, type: String, year: String?, tmdbId: Int?, doubanId: String?, season: Int = 0) async throws {
-        var request = try createRequest(endpoint: "/api/v1/subscribe", method: "POST")
+        print("🔵 [APIService] 订阅请求参数:")
+        print("   name: \(name)")
+        print("   type: \(type)")
+        print("   year: \(year ?? "nil")")
+        print("   tmdbId: \(tmdbId?.description ?? "nil")")
+        print("   doubanId: \(doubanId ?? "nil")")
+        print("   season: \(season)")
+        
+        var request = try createRequest(endpoint: "/api/v1/subscribe/", method: "POST")
+        
+        // 打印设置body前的headers
+        print("   📋 设置body前的Headers:")
+        if let headers = request.allHTTPHeaderFields {
+            for (key, value) in headers {
+                if key == "Authorization" {
+                    print("      \(key): Bearer \(authManager.accessToken.prefix(20))...")
+                } else {
+                    print("      \(key): \(value)")
+                }
+            }
+        }
         
         var body: [String: Any] = [
             "name": name,
@@ -288,9 +348,33 @@ class APIService {
         
         body["bangumiid"] = NSNull()
         
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        let bodyData = try JSONSerialization.data(withJSONObject: body)
         
-        let _: EmptyResponse = try await performRequest(request)
+        if let bodyString = String(data: bodyData, encoding: .utf8) {
+            print("   📦 请求体: \(bodyString)")
+        }
+        
+        request.httpBody = bodyData
+        
+        // 打印设置body后的headers
+        print("   📋 设置body后的Headers:")
+        if let headers = request.allHTTPHeaderFields {
+            for (key, value) in headers {
+                if key == "Authorization" {
+                    print("      \(key): Bearer \(authManager.accessToken.prefix(20))...")
+                } else {
+                    print("      \(key): \(value)")
+                }
+            }
+        } else {
+            print("      ⚠️ Headers 为 nil!")
+        }
+        
+        // 订阅API返回包装格式 {"success":true,"message":"","data":{"id":54}}
+        struct SubscribeResponseData: Codable {
+            let id: Int
+        }
+        let _: MoviePilotResponse<SubscribeResponseData> = try await performRequest(request)
     }
     
     func deleteSubscription(id: Int) async throws {
@@ -418,6 +502,13 @@ class APIService {
 }
 
 // MARK: - Response Models
+
+// MoviePilot 标准响应包装
+struct MoviePilotResponse<T: Codable>: Codable {
+    let success: Bool
+    let message: String
+    let data: T?
+}
 
 struct DownloadHistoryResponse: Codable {
     let items: [DownloadHistory]?

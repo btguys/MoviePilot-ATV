@@ -371,7 +371,38 @@ class MediaDetailViewModel: ObservableObject {
     }
 
     func toggleSeasonSubscription(seasonNumber: Int, isCurrentlySubscribed: Bool) async {
-        seasonSubscriptionStatus[seasonNumber] = !isCurrentlySubscribed
+        guard let detail = mediaDetail else { return }
+        
+        isSubscribing = true
+        defer { isSubscribing = false }
+        
+        do {
+            if isCurrentlySubscribed {
+                // 取消订阅逻辑（如果API支持）
+                print("🔵 [MediaDetailVM] 取消订阅季: \(detail.title) - 第\(seasonNumber)季")
+                // TODO: 调用取消订阅API（如果有）
+                seasonSubscriptionStatus[seasonNumber] = false
+            } else {
+                // 订阅此季
+                print("🔵 [MediaDetailVM] 订阅季: \(detail.title) - 第\(seasonNumber)季")
+                
+                try await apiService.subscribe(
+                    name: detail.title,
+                    type: detail.type ?? "电视剧",
+                    year: detail.year,
+                    tmdbId: detail.tmdbId,
+                    doubanId: detail.doubanId,
+                    season: seasonNumber
+                )
+                
+                print("✅ [MediaDetailVM] 订阅季成功")
+                seasonSubscriptionStatus[seasonNumber] = true
+            }
+        } catch {
+            print("❌ [MediaDetailVM] 订阅季失败: \(error)")
+            errorMessage = "订阅失败: \(error.localizedDescription)"
+            showError = true
+        }
     }
     
     // 订阅

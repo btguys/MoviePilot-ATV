@@ -89,15 +89,19 @@ struct MainView: View {
             .tag(NavigationItem.settings)
         }
         .onAppear {
-            if selectedTab == .home {
+            // 仅在首页且设置开启时启动系统状态更新
+            if selectedTab == .home && authManager.showHomeSystemStatus {
                 systemStatusViewModel.startUpdating()
             }
         }
         .onChange(of: selectedTab) { newValue in
-            if newValue == .home {
-                systemStatusViewModel.startUpdating()
-            } else {
-                systemStatusViewModel.stopUpdating()
+            // 仅在设置开启时控制系统状态更新
+            if authManager.showHomeSystemStatus {
+                if newValue == .home {
+                    systemStatusViewModel.startUpdating()
+                } else {
+                    systemStatusViewModel.stopUpdating()
+                }
             }
             // 当切换 tab 时，设置焦点到该 tab item
             focusedTab = newValue
@@ -303,45 +307,22 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 80)
                 
-                // 调试工具
+                // 显示设置
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Top Shelf 调试")
+                    Text("显示设置")
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(.white)
                     
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            print("🔧 [Debug] 手动触发 Top Shelf 数据检查")
-                            TopShelfHelper.shared.debugPrintSharedData()
-                        }) {
-                            HStack(spacing: 12) {
-                                Image(systemName: "ladybug")
-                                    .font(.system(size: 20))
-                                Text("检查数据")
-                                    .font(.system(size: 22, weight: .semibold))
-                            }
-                            .foregroundColor(.white)
-                            .frame(width: 300, height: 60)
-                            .background(Color.blue.opacity(0.6))
-                            .cornerRadius(12)
-                        }
-                        
-                        Button(action: {
-                            print("🔧 [Debug] 手动触发 Top Shelf 刷新")
-                            print("📝 [Debug] tvOS 会自动刷新 Top Shelf，请退出 app 并等待 2-3 秒")
-                            print("📝 [Debug] 或者尝试切换到其他 app 再回来")
-                        }) {
-                            HStack(spacing: 12) {
-                                Image(systemName: "arrow.clockwise")
-                                    .font(.system(size: 20))
-                                Text("手动刷新")
-                                    .font(.system(size: 22, weight: .semibold))
-                            }
-                            .foregroundColor(.white)
-                            .frame(width: 300, height: 60)
-                            .background(Color.orange.opacity(0.6))
-                            .cornerRadius(12)
-                        }
+                    VStack(spacing: 16) {
+                        Toggle("显示首页系统状态栏", isOn: Binding(
+                            get: { authManager.showHomeSystemStatus },
+                            set: { authManager.saveShowHomeSystemStatus($0) }
+                        ))
+                        .font(.system(size: 20))
+                        .foregroundColor(.white)
+                        .padding(24)
+                        .background(Color.white.opacity(0.05))
+                        .cornerRadius(12)
                     }
                 }
                 .padding(.horizontal, 80)

@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @ObservedObject var systemStatusViewModel: SystemStatusViewModel
+    @StateObject private var authManager = AuthenticationManager.shared
     @FocusState private var focusedCardId: Int?
     @State private var lastFocusedCardId: Int?
     @State private var heroMedia: MediaItem? // 当前Hero显示的媒体
@@ -129,19 +130,25 @@ struct HomeView: View {
             }
             }
             
-            // 浮动系统状态卡片（右下角）
-            VStack {
-                Spacer()
-                SystemStatusCard(viewModel: systemStatusViewModel)
-                    .frame(width: 300)
-                    .padding(.trailing, 10)
-                    .padding(.bottom, 10)
+            // 浮动系统状态卡片（右下角）- 根据设置显示
+            if authManager.showHomeSystemStatus {
+                VStack {
+                    Spacer()
+                    SystemStatusCard(viewModel: systemStatusViewModel)
+                        .frame(width: 300)
+                        .padding(.trailing, 10)
+                        .padding(.bottom, 10)
+                }
+                .zIndex(3)
             }
-            .zIndex(3)
         }
         .onAppear {
             viewModel.loadData()
-            systemStatusViewModel.startUpdating()
+            
+            // 仅在设置开启时启动系统状态更新
+            if authManager.showHomeSystemStatus {
+                systemStatusViewModel.startUpdating()
+            }
             
             // 恢复之前聚焦的卡片
             if let last = lastFocusedCardId {
@@ -163,6 +170,15 @@ struct HomeView: View {
         .onDisappear {
             systemStatusViewModel.stopUpdating()
             print("🛑 [HomeView] 已停止系统状态更新")
+        }
+        .onChange(of: authManager.showHomeSystemStatus) { _, newValue in
+            if newValue {
+                print("✅ [HomeView] 设置已开启，启动系统状态更新")
+                systemStatusViewModel.startUpdating()
+            } else {
+                print("⭕ [HomeView] 设置已关闭，停止系统状态更新")
+                systemStatusViewModel.stopUpdating()
+            }
         }
         .onChange(of: focusedCardId) { newValue in
             if let newValue {

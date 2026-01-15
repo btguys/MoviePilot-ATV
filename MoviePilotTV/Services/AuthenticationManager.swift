@@ -20,6 +20,7 @@ class AuthenticationManager: ObservableObject {
     @Published var savedPassword: String = ""
     @Published var showTokenExpiredAlert = false
     @Published var tokenExpiredMessage = ""
+    @Published var showHomeSystemStatus: Bool = true
     
     private let userDefaults = UserDefaults.standard
     private let endpointKey = "apiEndpoint"
@@ -27,6 +28,7 @@ class AuthenticationManager: ObservableObject {
     private let tmdbApiKeyKey = "tmdbApiKey"
     private let usernameKey = "savedUsername"
     private let passwordKey = "savedPassword"
+    private let showHomeSystemStatusKey = "showHomeSystemStatus"
     
     private init() {
         loadCredentials()
@@ -41,6 +43,12 @@ class AuthenticationManager: ObservableObject {
         tmdbApiKey = key
         userDefaults.set(key, forKey: tmdbApiKeyKey)
         print("✅ [AuthManager] TMDB API KEY 已保存到 UserDefaults")
+    }
+    
+    func saveShowHomeSystemStatus(_ show: Bool) {
+        showHomeSystemStatus = show
+        userDefaults.set(show, forKey: showHomeSystemStatusKey)
+        print("✅ [AuthManager] 首页系统状态栏显示设置已保存: \(show)")
     }
     
     func login(endpoint: String, username: String, password: String) async throws {
@@ -172,6 +180,10 @@ class AuthenticationManager: ObservableObject {
             savedPassword = password
             print("   ✅ 已保存的密码: ******")
         }
+        
+        // 加载显示系统状态栏设置，默认为 true
+        showHomeSystemStatus = userDefaults.object(forKey: showHomeSystemStatusKey) as? Bool ?? true
+        print("   ✅ 显示首页系统状态栏: \(showHomeSystemStatus)")
     }
 }
 

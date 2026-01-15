@@ -175,7 +175,7 @@ struct SubscriptionsView: View {
             NavigationLink(
                 destination: MediaDetailView(
                     media: MediaItem.from(subscription),
-                    shouldAutoSearch: currentAutoSearch && selectedSubscription?.id == subscription.id
+                    shouldAutoSearch: shouldAutoSearch && selectedSubscription?.id == subscription.id
                 ),
                 isActive: Binding(
                     get: { navigationActive && selectedSubscription?.id == subscription.id },
