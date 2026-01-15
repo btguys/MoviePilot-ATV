@@ -20,6 +20,7 @@ struct SubscriptionsView: View {
     @State private var focusedCardId: String?  // 记录当前焦点卡片
     @FocusState private var focusedCard: String?  // 焦点状态绑定
     @State private var firstCardId: String?  // 记录第一张卡片的ID
+    @State private var shouldRestoreFocus = false  // 标记是否需要恢复焦点
     
     var body: some View {
         ZStack {
@@ -108,15 +109,18 @@ struct SubscriptionsView: View {
             viewModel.loadSubscriptions()
             // 页面加载时不自动设置焦点，保持在 tab 导航上
             focusedFilter = nil
-            focusedCard = nil
-            // 记录第一张卡片的 ID
-            if let firstSubscription = viewModel.filteredSubscriptions.first {
-                firstCardId = String(firstSubscription.id)
+            // 如果是从详情页返回，需要恢复焦点
+            if shouldRestoreFocus, let cardId = focusedCardId {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    focusedCard = cardId
+                    shouldRestoreFocus = false  // 重置标志
+                }
             }
         }
         .onChange(of: selectedTab) { newValue in
             if newValue == .subscriptions {
                 viewModel.loadSubscriptions()
+                shouldRestoreFocus = false  // 从其他tab切换过来时不恢复焦点
             }
         }
         .onChange(of: viewModel.filteredSubscriptions) { _ in
@@ -185,7 +189,7 @@ struct SubscriptionsView: View {
                             currentAutoSearch = false
                             shouldAutoSearch = false
                             selectedSubscription = nil
-                            focusedCard = focusedCardId
+                            shouldRestoreFocus = true  // 标记需要恢复焦点
                         }
                     }
                 )

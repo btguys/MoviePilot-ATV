@@ -276,6 +276,7 @@ class MediaDetailViewModel: ObservableObject {
                 if searchResults.isEmpty {
                     errorMessage = "未找到可用资源"
                     showError = true
+                    showSearchProgress = false  // 关闭进度条
                 }
             }
         } catch {

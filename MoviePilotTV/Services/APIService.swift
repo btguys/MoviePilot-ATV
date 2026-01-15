@@ -399,7 +399,11 @@ class APIService {
     // MARK: - Download API
     
     func getDownloads() async throws -> [Download] {
-        let request = try createRequest(endpoint: "/api/v1/download")
+        var request = try createRequest(endpoint: "/api/v1/download")
+        
+        // 禁用缓存，确保获取最新数据
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        
         return try await performRequest(request)
     }
     
@@ -712,7 +716,11 @@ extension APIService {
     func getDownloadTasks(downloaderName: String) async throws -> [DownloadTask] {
         let encodedName = downloaderName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? downloaderName
         let endpoint = "/api/v1/download/?name=\(encodedName)"
-        let request = try createRequest(endpoint: endpoint)
+        var request = try createRequest(endpoint: endpoint)
+        
+        // 禁用缓存，确保获取最新数据
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        
         return try await performRequest(request)
     }
 
