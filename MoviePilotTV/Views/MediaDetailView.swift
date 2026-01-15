@@ -557,6 +557,11 @@ struct MediaDetailView: View {
     @ViewBuilder
     private func detailContentSection(detail: MediaDetail) -> some View {
         VStack(alignment: .leading, spacing: 40) {
+            // 按照页面布局从上到下的自然顺序排列焦点区域：
+            // 1. 季卡片（如有，紧接按钮下方）
+            // 2. 主创团队
+            // 3. 演员阵容
+            
             seasonsSection(detail: detail)
             crewGridSection(detail: detail)
 
@@ -701,10 +706,20 @@ struct MediaDetailView: View {
                     .font(.system(size: 30, weight: .bold))
                     .foregroundColor(.white)
                 
-                let grid = Array(repeating: GridItem(.flexible(), spacing: 16), count: 5)
-                LazyVGrid(columns: grid, alignment: .leading, spacing: 16) {
-                    ForEach(seasonCards) { card in
-                        seasonCardButton(card: card, detail: detail)
+                // 使用普通Grid而非LazyVGrid，确保立即渲染，让焦点系统能正确识别
+                Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 16) {
+                    ForEach(0..<((seasonCards.count + 4) / 5), id: \..self) { rowIndex in
+                        GridRow {
+                            ForEach(0..<5, id: \.self) { colIndex in
+                                let index = rowIndex * 5 + colIndex
+                                if index < seasonCards.count {
+                                    seasonCardButton(card: seasonCards[index], detail: detail)
+                                } else {
+                                    Color.clear
+                                        .frame(maxWidth: .infinity)
+                                }
+                            }
+                        }
                     }
                 }
                 .focusSection()  // 设置季卡片为独立焦点区域
@@ -739,23 +754,34 @@ struct MediaDetailView: View {
                     .font(.system(size: 30, weight: .bold))
                     .foregroundColor(.white)
                 
-                let grid = Array(repeating: GridItem(.flexible(), spacing: 24), count: 3)
-                LazyVGrid(columns: grid, alignment: .leading, spacing: 18) {
-                    ForEach(items) { item in
-                        Button(action: {}) {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(item.role)
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(.white.opacity(0.9))
-                                Text(item.name)
-                                    .font(.system(size: 18, weight: .semibold))
-                                    .foregroundColor(.white)
-                                    .lineLimit(1)
-                                    .multilineTextAlignment(.leading)
+                // 使用普通Grid而非LazyVGrid，确保立即渲染
+                Grid(alignment: .leading, horizontalSpacing: 24, verticalSpacing: 18) {
+                    ForEach(0..<((items.count + 2) / 3), id: \.self) { rowIndex in
+                        GridRow {
+                            ForEach(0..<3, id: \.self) { colIndex in
+                                let index = rowIndex * 3 + colIndex
+                                if index < items.count {
+                                    let item = items[index]
+                                    Button(action: {}) {
+                                        VStack(alignment: .leading, spacing: 6) {
+                                            Text(item.role)
+                                                .font(.system(size: 16, weight: .semibold))
+                                                .foregroundColor(.white.opacity(0.9))
+                                            Text(item.name)
+                                                .font(.system(size: 18, weight: .semibold))
+                                                .foregroundColor(.white)
+                                                .lineLimit(1)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                    .buttonStyle(SoftFocusButtonStyle())
+                                } else {
+                                    Color.clear
+                                        .frame(maxWidth: .infinity)
+                                }
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .buttonStyle(SoftFocusButtonStyle())
                     }
                 }
                 .focusSection()  // 设置主创团队为独立焦点区域

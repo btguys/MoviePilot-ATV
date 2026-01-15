@@ -102,23 +102,28 @@ struct HomeView: View {
                 if newValue != nil {
                     // 判断焦点卡片属于哪个section，然后滚动到对应section
                     var targetId = "heroSection"
+                    var scrollAnchor: UnitPoint = .center
                     
                     if let focusedMedia = viewModel.tmdbTrending.first(where: { $0.id == newValue }) {
-                        // 焦点在TMDB推荐，滚动到Hero（使Hero贴近屏幕上边界）
+                        // 焦点在TMDB推荐（第一行），滚动到heroSection，使用向上偏移的anchor
+                        // 让导航栏滚出屏幕，同时Hero完全可见
                         targetId = "heroSection"
+                        scrollAnchor = UnitPoint(x: 0.5, y: -0.45)
                         heroMedia = focusedMedia
                     } else if let focusedMedia = viewModel.doubanHotMovies.first(where: { $0.id == newValue }) {
                         // 焦点在豆瓣电影，滚动到该section
                         targetId = "doubanMoviesSection"
+                        scrollAnchor = .center
                         heroMedia = focusedMedia
                     } else if let focusedMedia = viewModel.doubanHotTVs.first(where: { $0.id == newValue }) {
                         // 焦点在豆瓣剧集，滚动到该section
                         targetId = "doubanTVsSection"
+                        scrollAnchor = .center
                         heroMedia = focusedMedia
                     }
                     
                     withAnimation(.easeInOut(duration: 0.3)) {
-                        scrollProxy.scrollTo(targetId, anchor: .center)
+                        scrollProxy.scrollTo(targetId, anchor: scrollAnchor)
                     }
                 }
             }
