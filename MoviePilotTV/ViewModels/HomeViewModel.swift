@@ -137,6 +137,12 @@ class HomeViewModel: ObservableObject {
             cacheManager.saveFeaturedMedia(featuredMedia)
             
             // 更新 Top Shelf 内容
+            print("🔝 [HomeViewModel] 准备更新 Top Shelf，TMDB 项目数: \(tmdbArray.count)")
+            if tmdbArray.isEmpty {
+                print("⚠️ [HomeViewModel] TMDB 数组为空，Top Shelf 将无内容!")
+            } else {
+                print("   前3项: \(tmdbArray.prefix(3).map { $0.title })")
+            }
             TopShelfHelper.shared.updateTopShelfRecommendations(tmdbArray)
             
             print("✅ [HomeViewModel] 推荐内容已保存到缓存")

@@ -96,10 +96,12 @@ class AuthenticationManager: ObservableObject {
             userDefaults.set(loginResponse.accessToken, forKey: tokenKey)
             
             // 同步登录状态到 Top Shelf Extension
+            print("🔝 [AuthManager] 同步认证状态到 Top Shelf")
             TopShelfHelper.shared.updateAuthenticationState(
                 token: loginResponse.accessToken,
                 endpoint: endpoint
             )
+            print("🔝 [AuthManager] 认证状态同步完成")
         } catch let error as DecodingError {
             print("❌ Decoding error: \(error)")
             throw APIError.decodingError(error)

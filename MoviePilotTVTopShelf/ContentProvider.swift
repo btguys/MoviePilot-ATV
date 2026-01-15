@@ -11,12 +11,22 @@ import Foundation
 class ContentProvider: TVTopShelfContentProvider {
     
     override func loadTopShelfContent(completionHandler: @escaping (TVTopShelfContent?) -> Void) {
-        print("🔝 [TopShelf] 开始加载 Top Shelf 内容")
+        print("🔝 [TopShelf] ========== ContentProvider 被调用 ==========")
+        print("🔝 [TopShelf] 时间: \(Date())")
+        
+        // 验证 App Group
+        guard let sharedDefaults = UserDefaults(suiteName: "group.com.hvg.moviepilot-atv") else {
+            print("❌ [TopShelf] CRITICAL: 无法访问 App Group!")
+            completionHandler(nil)
+            return
+        }
+        print("✅ [TopShelf] App Group 访问成功")
         
         // 检查登录状态
-        guard let _ = UserDefaults(suiteName: "group.com.moviepilot.tv")?.string(forKey: "accessToken"),
-              !UserDefaults(suiteName: "group.com.moviepilot.tv")!.string(forKey: "accessToken")!.isEmpty else {
-            print("⚠️ [TopShelf] 未登录，返回空内容")
+        if let token = sharedDefaults.string(forKey: "accessToken"), !token.isEmpty {
+            print("✅ [TopShelf] 已登录 (token: \(token.prefix(20))...)")
+        } else {
+            print("⚠️ [TopShelf] 未登录或 token 为空，返回空内容")
             completionHandler(nil)
             return
         }
@@ -33,15 +43,20 @@ class ContentProvider: TVTopShelfContentProvider {
     }
     
     private func loadCachedRecommendations() -> [TopShelfMediaItem]? {
-        guard let sharedDefaults = UserDefaults(suiteName: "group.com.moviepilot.tv") else {
+        guard let sharedDefaults = UserDefaults(suiteName: "group.com.hvg.moviepilot-atv") else {
             print("❌ [TopShelf] 无法访问共享 UserDefaults")
             return nil
         }
         
+        // 列出所有存储的 key
+        let allKeys = sharedDefaults.dictionaryRepresentation().keys
+        print("🔍 [TopShelf] App Group 中的所有 keys: \(allKeys)")
+        
         guard let data = sharedDefaults.data(forKey: "topShelfRecommendations") else {
-            print("⚠️ [TopShelf] 缓存数据不存在")
+            print("⚠️ [TopShelf] Key 'topShelfRecommendations' 不存在或为空")
             return nil
         }
+        print("✅ [TopShelf] 读取到数据，大小: \(data.count) bytes")
         
         do {
             let items = try JSONDecoder().decode([TopShelfMediaItem].self, from: data)
@@ -64,9 +79,11 @@ class ContentProvider: TVTopShelfContentProvider {
             contentItem.title = item.title
             contentItem.displayAction = TVTopShelfAction(url: displayURL)
             
-            // 设置海报图片
+            // 设置海报图片（使用 poster 竖版图）
             if let posterURLString = item.posterURL,
                let posterURL = URL(string: posterURLString) {
+                // 设置图片形状为 poster（竖版海报）
+                contentItem.imageShape = .poster
                 contentItem.setImageURL(posterURL, for: .screenScale1x)
                 contentItem.setImageURL(posterURL, for: .screenScale2x)
                 print("✅ [TopShelf] 设置图片: \(item.title) - \(posterURLString.prefix(50))...")
@@ -91,6 +108,7 @@ struct TopShelfMediaItem: Codable {
     let title: String
     let posterURL: String?
     let source: String
+    let type: String?
     let tmdbId: Int?
     let doubanId: String?
 }

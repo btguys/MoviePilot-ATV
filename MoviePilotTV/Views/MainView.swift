@@ -24,21 +24,15 @@ struct MainView: View {
     @State private var showLogoutAlert = false
     @FocusState private var focusedTab: NavigationItem?
     @Binding var deepLinkMedia: MediaItem?
-    @State private var showingDeepLinkDetail = false
+    @State private var navigationPath = NavigationPath()
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationStack {
+            NavigationStack(path: $navigationPath) {
                 HomeView(systemStatusViewModel: systemStatusViewModel)
-                    .background(
-                        NavigationLink(
-                            destination: deepLinkMedia.map { MediaDetailView(media: $0) },
-                            isActive: $showingDeepLinkDetail
-                        ) {
-                            EmptyView()
-                        }
-                        .hidden()
-                    )
+                    .navigationDestination(for: MediaItem.self) { media in
+                        MediaDetailView(media: media)
+                    }
             }
             .tabItem {
                 Label("首页", systemImage: "house.fill")
@@ -109,11 +103,21 @@ struct MainView: View {
             focusedTab = newValue
         }
         .onChange(of: deepLinkMedia) { media in
-            if media != nil {
-                // 切换到首页并显示详情
+            print("🎯 [MainView] deepLinkMedia onChange 被触发")
+            if let media = media {
+                print("🎯 [MainView] 媒体数据: \(media.title)")
+                // 切换到首页
                 selectedTab = .home
-                showingDeepLinkDetail = true
-                print("✅ [MainView] 触发深链接导航")
+                // 清空导航路径并推入新媒体
+                navigationPath = NavigationPath()
+                navigationPath.append(media)
+                print("✅ [MainView] 深链接导航已设置 - 已推入媒体到导航堆栈")
+                // 清空 deepLinkMedia 以便下次使用
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    deepLinkMedia = nil
+                }
+            } else {
+                print("⚠️ [MainView] deepLinkMedia 为 nil")
             }
         }
         .alert("退出登录", isPresented: $showLogoutAlert) {
@@ -298,6 +302,50 @@ struct SettingsView: View {
                     }
                 }
                 .padding(.horizontal, 80)
+                
+                // 调试工具
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Top Shelf 调试")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    HStack(spacing: 20) {
+                        Button(action: {
+                            print("🔧 [Debug] 手动触发 Top Shelf 数据检查")
+                            TopShelfHelper.shared.debugPrintSharedData()
+                        }) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "ladybug")
+                                    .font(.system(size: 20))
+                                Text("检查数据")
+                                    .font(.system(size: 22, weight: .semibold))
+                            }
+                            .foregroundColor(.white)
+                            .frame(width: 300, height: 60)
+                            .background(Color.blue.opacity(0.6))
+                            .cornerRadius(12)
+                        }
+                        
+                        Button(action: {
+                            print("🔧 [Debug] 手动触发 Top Shelf 刷新")
+                            print("📝 [Debug] tvOS 会自动刷新 Top Shelf，请退出 app 并等待 2-3 秒")
+                            print("📝 [Debug] 或者尝试切换到其他 app 再回来")
+                        }) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.system(size: 20))
+                                Text("手动刷新")
+                                    .font(.system(size: 22, weight: .semibold))
+                            }
+                            .foregroundColor(.white)
+                            .frame(width: 300, height: 60)
+                            .background(Color.orange.opacity(0.6))
+                            .cornerRadius(12)
+                        }
+                    }
+                }
+                .padding(.horizontal, 80)
+                .padding(.top, 20)
                 
                 // 退出登录按钮
                 Button(action: {

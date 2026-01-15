@@ -7,7 +7,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>moviepilotatv</string>
+				<string>moviepilot</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MediaItem: Codable, Identifiable, Equatable {
+struct MediaItem: Codable, Identifiable, Equatable, Hashable {
     let tmdbId: Int?
     let imdbId: String?
     let doubanId: String?
