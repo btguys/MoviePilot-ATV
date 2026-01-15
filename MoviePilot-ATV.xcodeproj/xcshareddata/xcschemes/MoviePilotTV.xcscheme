@@ -18,7 +18,7 @@
                BlueprintIdentifier = "4A00FF"
                BuildableName = "MoviePilotTV.app"
                BlueprintName = "MoviePilotTV"
-               ReferencedContainer = "container:MoviePilotTV.xcodeproj">
+               ReferencedContainer = "container:MoviePilot-ATV.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "4A00FF"
             BuildableName = "MoviePilotTV.app"
             BlueprintName = "MoviePilotTV"
-            ReferencedContainer = "container:MoviePilotTV.xcodeproj">
+            ReferencedContainer = "container:MoviePilot-ATV.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +64,7 @@
             BlueprintIdentifier = "4A00FF"
             BuildableName = "MoviePilotTV.app"
             BlueprintName = "MoviePilotTV"
-            ReferencedContainer = "container:MoviePilotTV.xcodeproj">
+            ReferencedContainer = "container:MoviePilot-ATV.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

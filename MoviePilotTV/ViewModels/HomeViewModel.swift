@@ -114,6 +114,16 @@ class HomeViewModel: ObservableObject {
             tmdbTrending = tmdbArray
             doubanHotMovies = moviesArray
             doubanHotTVs = tvsArray
+
+            // 记录豆瓣海报可用性，排查图片无法显示问题
+            let movieMissingPoster = moviesArray.filter { ($0.posterPath ?? "").isEmpty }.count
+            let tvMissingPoster = tvsArray.filter { ($0.posterPath ?? "").isEmpty }.count
+            print("🟣 [HomeViewModel] 豆瓣热门电影: 总数=\(moviesArray.count), 海报缺失=\(movieMissingPoster)")
+            print("🟣 [HomeViewModel] 豆瓣热门剧集: 总数=\(tvsArray.count), 海报缺失=\(tvMissingPoster)")
+            let moviePosterSamples = moviesArray.prefix(3).map { $0.posterPath ?? "<nil>" }.joined(separator: " | ")
+            let tvPosterSamples = tvsArray.prefix(3).map { $0.posterPath ?? "<nil>" }.joined(separator: " | ")
+            print("🔎 [HomeViewModel] 豆瓣电影 posterPath 样本: \(moviePosterSamples)")
+            print("🔎 [HomeViewModel] 豆瓣剧集 posterPath 样本: \(tvPosterSamples)")
             
             // 设置精选内容
             if !tmdb.isEmpty {

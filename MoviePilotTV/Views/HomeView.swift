@@ -320,6 +320,9 @@ struct MediaCard: View {
                                 .aspectRatio(2/3, contentMode: .fill)
                         case .failure:
                             Color.gray.opacity(0.3)
+                                .onAppear {
+                                    print("⚠️ [MediaCard] 图片加载失败 source=\(media.source ?? "<nil>") title=\(media.title) posterPath=\(media.posterPath ?? "<nil>") url=\(posterURL)")
+                                }
                         @unknown default:
                             Color.gray.opacity(0.3)
                         }
@@ -328,6 +331,9 @@ struct MediaCard: View {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
                         .aspectRatio(2/3, contentMode: .fill)
+                        .onAppear {
+                            print("⚠️ [MediaCard] 缺少 posterURL source=\(media.source ?? "<nil>") title=\(media.title) posterPath=\(media.posterPath ?? "<nil>")")
+                        }
                 }
                 
                 // Rating Badge

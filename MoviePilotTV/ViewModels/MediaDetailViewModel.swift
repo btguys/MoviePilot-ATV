@@ -7,6 +7,23 @@
 
 import Foundation
 
+struct Episode: Identifiable {
+    let id = UUID()
+    let episodeNumber: Int
+    let name: String
+    let overview: String?
+    let airDate: String?
+    let stillPath: String?
+    
+    var stillURL: URL? {
+        guard let path = stillPath, !path.isEmpty else { return nil }
+        if path.hasPrefix("http") {
+            return URL(string: path)
+        }
+        return URL(string: "https://image.tmdb.org/t/p/w500\(path)")
+    }
+}
+
 @MainActor
 class MediaDetailViewModel: ObservableObject {
     @Published var mediaDetail: MediaDetail?
@@ -26,10 +43,18 @@ class MediaDetailViewModel: ObservableObject {
     @Published var searchProgress: Double = 0
     @Published var searchProgressText: String = ""
     @Published var showSearchProgress = false
+    @Published var visibleSearchResults: [Torrent] = []
+    @Published var scrollToResultsNonce = UUID()
+    @Published var isSubscribed = false
+    @Published var seasonSubscriptionStatus: [Int: Bool] = [:]
+    @Published var seasonsExistData: [String: [Int]] = [:]
+    @Published var episodes: [Episode] = []
+    @Published var isLoadingEpisodes = false
     
     private let apiService = APIService.shared
     private let sseService = SSEService()
     private var searchCompleteTimer: Timer?
+    private let searchPageSize = 20
     
     // 从 MediaItem 加载详情
     func loadDetail(from media: MediaItem) {
@@ -96,6 +121,7 @@ class MediaDetailViewModel: ObservableObject {
                 typeName: typeName
             )
             print("✅ [MediaDetailVM] 详情加载成功 - \(mediaDetail?.title ?? "未知标题")")
+            seasonsExistData = mediaDetail?.seasons ?? [:]
             
             // 如果是 TMDB 来源，加载演职人员信息
             if source == "tmdb", let tmdbId = Int(id) {
@@ -238,6 +264,7 @@ class MediaDetailViewModel: ObservableObject {
             // 确保在主线程更新 UI
             await MainActor.run {
                 searchResults = result.torrents ?? []
+                resetVisibleResults()
                 print("✅ [MediaDetailVM] 找到 \(searchResults.count) 个资源")
                 print("🔵 [MediaDetailVM] searchResults 已更新，count = \(searchResults.count)")
                 
@@ -259,6 +286,53 @@ class MediaDetailViewModel: ObservableObject {
                 showSearchProgress = false
             }
         }
+    }
+
+    private func resetVisibleResults() {
+        if searchResults.isEmpty {
+            visibleSearchResults = []
+            return
+        }
+        let end = min(searchPageSize, searchResults.count)
+        visibleSearchResults = Array(searchResults.prefix(end))
+        scrollToResultsNonce = UUID()
+    }
+
+    func loadMoreResultsIfNeeded(currentIndex: Int) {
+        guard currentIndex >= visibleSearchResults.count - 5 else { return }
+        guard visibleSearchResults.count < searchResults.count else { return }
+        let nextEnd = min(visibleSearchResults.count + searchPageSize, searchResults.count)
+        let slice = searchResults[visibleSearchResults.count..<nextEnd]
+        visibleSearchResults.append(contentsOf: slice)
+    }
+
+    func loadEpisodes(tmdbId: Int, seasonNumber: Int) async {
+        print("🔵 [MediaDetailVM] 加载剧集列表 - tmdbId: \(tmdbId), season: \(seasonNumber)")
+        isLoadingEpisodes = true
+        defer { isLoadingEpisodes = false }
+        let existing = mediaDetail?.seasons?[String(seasonNumber)] ?? []
+        let countFromInfo = mediaDetail?.seasonInfo?.first(where: { $0.seasonNumber == seasonNumber })?.episodeCount ?? 0
+        let maxNumber = max(existing.max() ?? 0, countFromInfo)
+        let total = max(maxNumber, existing.count)
+        let numbers: [Int]
+        if total > 0 {
+            numbers = Array(1...total)
+        } else {
+            numbers = []
+        }
+        episodes = numbers.map { number in
+            Episode(
+                episodeNumber: number,
+                name: "第 \(number) 集",
+                overview: nil,
+                airDate: nil,
+                stillPath: nil
+            )
+        }
+    }
+
+    func toggleSeasonSubscription(seasonNumber: Int, isCurrentlySubscribed: Bool) async {
+        seasonSubscriptionStatus[seasonNumber] = !isCurrentlySubscribed
     }
     
     // 订阅
@@ -289,6 +363,7 @@ class MediaDetailViewModel: ObservableObject {
             print("✅ [MediaDetailVM] 订阅成功")
             successMessage = "已成功订阅《\(detail.title)》"
             showSuccessAlert = true
+            isSubscribed = true
         } catch {
             print("❌ [MediaDetailVM] 订阅失败: \(error)")
             errorMessage = "订阅失败: \(error.localizedDescription)"

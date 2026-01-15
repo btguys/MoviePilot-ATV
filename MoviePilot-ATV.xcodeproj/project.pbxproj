@@ -234,7 +234,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 4A00FB /* Build configuration list for PBXProject "MoviePilotTV" */;
+			buildConfigurationList = 4A00FB /* Build configuration list for PBXProject "MoviePilot-ATV" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -505,7 +505,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4A00FB /* Build configuration list for PBXProject "MoviePilotTV" */ = {
+		4A00FB /* Build configuration list for PBXProject "MoviePilot-ATV" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4A010C /* Debug */,

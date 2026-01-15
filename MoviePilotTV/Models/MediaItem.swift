@@ -56,19 +56,25 @@ struct MediaItem: Codable, Identifiable {
     var posterURL: URL? {
         guard let posterPath = posterPath, !posterPath.isEmpty else { return nil }
         // API 已经返回完整的 URL
+        let rawURL: String
         if posterPath.hasPrefix("http") {
-            return URL(string: posterPath)
+            rawURL = posterPath
+        } else {
+            rawURL = "https://image.tmdb.org/t/p/w500\(posterPath)"
         }
-        return URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")
+        return URL(string: applyImageProxyIfNeeded(rawURL))
     }
     
     var backdropURL: URL? {
         guard let backdropPath = backdropPath, !backdropPath.isEmpty else { return nil }
         // API 已经返回完整的 URL
+        let rawURL: String
         if backdropPath.hasPrefix("http") {
-            return URL(string: backdropPath)
+            rawURL = backdropPath
+        } else {
+            rawURL = "https://image.tmdb.org/t/p/original\(backdropPath)"
         }
-        return URL(string: "https://image.tmdb.org/t/p/original\(backdropPath)")
+        return URL(string: applyImageProxyIfNeeded(rawURL))
     }
     
     var displayTitle: String {
@@ -111,5 +117,15 @@ struct MediaItem: Codable, Identifiable {
             originalLanguage: nil,
             source: nil
         )
+    }
+
+    private func applyImageProxyIfNeeded(_ urlString: String) -> String {
+        let lower = urlString.lowercased()
+        let isDouban = (source?.lowercased().contains("douban") ?? false) || lower.contains("doubanio.com")
+        guard isDouban else { return urlString }
+        let encoded = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? urlString
+        let base = UserDefaults.standard.string(forKey: "apiEndpoint")?.trimmingCharacters(in: CharacterSet(charactersIn: "/ ")) ?? ""
+        guard !base.isEmpty else { return urlString }
+        return "\(base)/api/v1/system/img/0?imgurl=\(encoded)"
     }
 }
