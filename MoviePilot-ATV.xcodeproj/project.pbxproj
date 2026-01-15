@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -40,8 +40,35 @@
 		780172E22F07799E00C7EAF0 /* SystemStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780172E12F07799E00C7EAF0 /* SystemStatusViewModel.swift */; };
 		780172E42F0779AE00C7EAF0 /* SystemStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780172E32F0779AE00C7EAF0 /* SystemStatusCard.swift */; };
 		780172E62F07A4FF00C7EAF0 /* Downloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780172E52F07A4FF00C7EAF0 /* Downloader.swift */; };
+		7864CA6E2F18D0BC00B507F8 /* TVServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7864CA6D2F18D0BC00B507F8 /* TVServices.framework */; };
+		7864CA752F18D0BC00B507F8 /* MoviePilotTVTopShelf.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7864CA6B2F18D0BC00B507F8 /* MoviePilotTVTopShelf.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7864CA822F18D83600B507F8 /* TopShelfHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7864CA802F18D83600B507F8 /* TopShelfHelper.swift */; };
 		B1CB0004D7BB78A24D3C8DB9 /* WebSocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBFD805634BCB59C67C7169 /* WebSocketService.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7864CA732F18D0BC00B507F8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4A00F8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7864CA6A2F18D0BC00B507F8;
+			remoteInfo = MoviePilotTVTopShelf;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7864CA7A2F18D0BC00B507F8 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7864CA752F18D0BC00B507F8 /* MoviePilotTVTopShelf.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		053F36E54E0D48FCA9F8821B /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
@@ -78,9 +105,27 @@
 		780172E12F07799E00C7EAF0 /* SystemStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemStatusViewModel.swift; sourceTree = "<group>"; };
 		780172E32F0779AE00C7EAF0 /* SystemStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemStatusCard.swift; sourceTree = "<group>"; };
 		780172E52F07A4FF00C7EAF0 /* Downloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Downloader.swift; sourceTree = "<group>"; };
+		7864CA6B2F18D0BC00B507F8 /* MoviePilotTVTopShelf.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MoviePilotTVTopShelf.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		7864CA6D2F18D0BC00B507F8 /* TVServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TVServices.framework; path = System/Library/Frameworks/TVServices.framework; sourceTree = SDKROOT; };
+		7864CA802F18D83600B507F8 /* TopShelfHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopShelfHelper.swift; sourceTree = "<group>"; };
+		7864CA842F18D9AA00B507F8 /* MoviePilotTV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MoviePilotTV.entitlements; sourceTree = "<group>"; };
 		A6269B6741F747DF8307FD41 /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
 		BEBFD805634BCB59C67C7169 /* WebSocketService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WebSocketService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		7864CA892F18DF1100B507F8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 7864CA6A2F18D0BC00B507F8 /* MoviePilotTVTopShelf */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		7864CA6F2F18D0BC00B507F8 /* MoviePilotTVTopShelf */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (7864CA892F18DF1100B507F8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = MoviePilotTVTopShelf; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		4A00FD /* Frameworks */ = {
@@ -90,12 +135,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7864CA682F18D0BC00B507F8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7864CA6E2F18D0BC00B507F8 /* TVServices.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0BCD796AC80A442DBFFE40B5 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				7864CA802F18D83600B507F8 /* TopShelfHelper.swift */,
 				524A7BE6880142EEB9AA626A /* ImageLoader.swift */,
 				053F36E54E0D48FCA9F8821B /* ImageCache.swift */,
 			);
@@ -106,6 +160,8 @@
 			isa = PBXGroup;
 			children = (
 				4A0102 /* MoviePilotTV */,
+				7864CA6F2F18D0BC00B507F8 /* MoviePilotTVTopShelf */,
+				7864CA6C2F18D0BC00B507F8 /* Frameworks */,
 				4A0101 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -114,6 +170,7 @@
 			isa = PBXGroup;
 			children = (
 				4A0000 /* MoviePilotTV.app */,
+				7864CA6B2F18D0BC00B507F8 /* MoviePilotTVTopShelf.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -121,6 +178,7 @@
 		4A0102 /* MoviePilotTV */ = {
 			isa = PBXGroup;
 			children = (
+				7864CA842F18D9AA00B507F8 /* MoviePilotTV.entitlements */,
 				4A0002 /* MoviePilotTVApp.swift */,
 				4A002D /* Info.plist */,
 				4A0103 /* Views */,
@@ -199,6 +257,14 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		7864CA6C2F18D0BC00B507F8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7864CA6D2F18D0BC00B507F8 /* TVServices.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -209,15 +275,39 @@
 				4A00FC /* Sources */,
 				4A00FD /* Frameworks */,
 				4A00FE /* Resources */,
+				7864CA7A2F18D0BC00B507F8 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				7864CA742F18D0BC00B507F8 /* PBXTargetDependency */,
 			);
 			name = MoviePilotTV;
 			productName = MoviePilotTV;
 			productReference = 4A0000 /* MoviePilotTV.app */;
 			productType = "com.apple.product-type.application";
+		};
+		7864CA6A2F18D0BC00B507F8 /* MoviePilotTVTopShelf */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7864CA772F18D0BC00B507F8 /* Build configuration list for PBXNativeTarget "MoviePilotTVTopShelf" */;
+			buildPhases = (
+				7864CA672F18D0BC00B507F8 /* Sources */,
+				7864CA682F18D0BC00B507F8 /* Frameworks */,
+				7864CA692F18D0BC00B507F8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				7864CA6F2F18D0BC00B507F8 /* MoviePilotTVTopShelf */,
+			);
+			name = MoviePilotTVTopShelf;
+			packageProductDependencies = (
+			);
+			productName = MoviePilotTVTopShelf;
+			productReference = 7864CA6B2F18D0BC00B507F8 /* MoviePilotTVTopShelf.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -226,11 +316,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					4A00FF = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					7864CA6A2F18D0BC00B507F8 = {
+						CreatedOnToolsVersion = 26.2;
 					};
 				};
 			};
@@ -248,6 +341,7 @@
 			projectRoot = "";
 			targets = (
 				4A00FF /* MoviePilotTV */,
+				7864CA6A2F18D0BC00B507F8 /* MoviePilotTVTopShelf */,
 			);
 		};
 /* End PBXProject section */
@@ -258,6 +352,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4A0003 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7864CA692F18D0BC00B507F8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +379,7 @@
 				4A000F /* SubscriptionsView.swift in Sources */,
 				4A0011 /* DownloadsView.swift in Sources */,
 				4A0013 /* SitesView.swift in Sources */,
+				7864CA822F18D83600B507F8 /* TopShelfHelper.swift in Sources */,
 				4A0015 /* AuthenticationManager.swift in Sources */,
 				780172E62F07A4FF00C7EAF0 /* Downloader.swift in Sources */,
 				4A0017 /* APIService.swift in Sources */,
@@ -304,7 +406,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7864CA672F18D0BC00B507F8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7864CA742F18D0BC00B507F8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7864CA6A2F18D0BC00B507F8 /* MoviePilotTVTopShelf */;
+			targetProxy = 7864CA732F18D0BC00B507F8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		4A010C /* Debug */ = {
@@ -437,14 +554,19 @@
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletv*]" = "Brand Assets";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = MoviePilotTV/MoviePilotTV.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = GZBG3L22Y5;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=appletvos*]" = GZBG3L22Y5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoviePilotTV/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "MoviePilot ATV";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -453,9 +575,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.qyj.moviepilot.atv;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hvg.moviepilot-atv";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "Movie Pilot ATV";
 				SDKROOT = appletvos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -473,14 +596,19 @@
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletv*]" = "Brand Assets";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = MoviePilotTV/MoviePilotTV.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = GZBG3L22Y5;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=appletvos*]" = GZBG3L22Y5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoviePilotTV/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "MoviePilot ATV";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -489,9 +617,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.qyj.moviepilot.atv;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hvg.moviepilot-atv";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "Movie Pilot ATV";
 				SDKROOT = appletvos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -499,6 +628,76 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 17.0;
+			};
+			name = Release;
+		};
+		7864CA782F18D0BC00B507F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MoviePilotTVTopShelf/MoviePilotTVTopShelf.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=appletvos*]" = GZBG3L22Y5;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MoviePilotTVTopShelf/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MoviePilotTVTopShelf;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hvg.moviepilot-atv.MoviePilotTVTopShelf";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "Movie Pilot ATV";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		7864CA792F18D0BC00B507F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MoviePilotTVTopShelf/MoviePilotTVTopShelf.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=appletvos*]" = GZBG3L22Y5;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MoviePilotTVTopShelf/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MoviePilotTVTopShelf;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hvg.moviepilot-atv.MoviePilotTVTopShelf";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "Movie Pilot ATV";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Release;
 		};
@@ -519,6 +718,15 @@
 			buildConfigurations = (
 				4A010F /* Debug */,
 				4A0110 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7864CA772F18D0BC00B507F8 /* Build configuration list for PBXNativeTarget "MoviePilotTVTopShelf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7864CA782F18D0BC00B507F8 /* Debug */,
+				7864CA792F18D0BC00B507F8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

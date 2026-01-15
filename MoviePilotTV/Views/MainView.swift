@@ -23,11 +23,22 @@ struct MainView: View {
     @StateObject private var systemStatusViewModel = SystemStatusViewModel()
     @State private var showLogoutAlert = false
     @FocusState private var focusedTab: NavigationItem?
+    @Binding var deepLinkMedia: MediaItem?
+    @State private var showingDeepLinkDetail = false
     
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
                 HomeView(systemStatusViewModel: systemStatusViewModel)
+                    .background(
+                        NavigationLink(
+                            destination: deepLinkMedia.map { MediaDetailView(media: $0) },
+                            isActive: $showingDeepLinkDetail
+                        ) {
+                            EmptyView()
+                        }
+                        .hidden()
+                    )
             }
             .tabItem {
                 Label("首页", systemImage: "house.fill")
@@ -97,6 +108,14 @@ struct MainView: View {
             // 当切换 tab 时，设置焦点到该 tab item
             focusedTab = newValue
         }
+        .onChange(of: deepLinkMedia) { media in
+            if media != nil {
+                // 切换到首页并显示详情
+                selectedTab = .home
+                showingDeepLinkDetail = true
+                print("✅ [MainView] 触发深链接导航")
+            }
+        }
         .alert("退出登录", isPresented: $showLogoutAlert) {
             Button("取消", role: .cancel) { }
             Button("确认退出", role: .destructive) {
@@ -112,7 +131,7 @@ struct MainView: View {
 
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        MainView()
+        MainView(deepLinkMedia: .constant(nil))
     }
 }
 

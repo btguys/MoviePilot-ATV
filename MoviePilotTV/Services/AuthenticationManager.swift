@@ -94,6 +94,12 @@ class AuthenticationManager: ObservableObject {
             self.isAuthenticated = true
             
             userDefaults.set(loginResponse.accessToken, forKey: tokenKey)
+            
+            // 同步登录状态到 Top Shelf Extension
+            TopShelfHelper.shared.updateAuthenticationState(
+                token: loginResponse.accessToken,
+                endpoint: endpoint
+            )
         } catch let error as DecodingError {
             print("❌ Decoding error: \(error)")
             throw APIError.decodingError(error)
@@ -109,6 +115,9 @@ class AuthenticationManager: ObservableObject {
         isAuthenticated = false
         accessToken = ""
         userDefaults.removeObject(forKey: tokenKey)
+        
+        // 清除 Top Shelf 的登录状态
+        TopShelfHelper.shared.updateAuthenticationState(token: nil, endpoint: nil)
     }
     
     func handleTokenExpired() {

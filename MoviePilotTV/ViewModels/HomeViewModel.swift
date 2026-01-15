@@ -136,6 +136,9 @@ class HomeViewModel: ObservableObject {
             cacheManager.saveDoubanHotTVs(tvsArray)
             cacheManager.saveFeaturedMedia(featuredMedia)
             
+            // 更新 Top Shelf 内容
+            TopShelfHelper.shared.updateTopShelfRecommendations(tmdbArray)
+            
             print("✅ [HomeViewModel] 推荐内容已保存到缓存")
             
         } catch {
