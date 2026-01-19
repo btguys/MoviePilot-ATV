@@ -458,6 +458,9 @@ class APIService {
         var request = URLRequest(url: url)
         request.setValue("Bearer \(authManager.accessToken)", forHTTPHeaderField: "Authorization")
         
+        // 禁用缓存，确保获取实时数据
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        
         let (data, response) = try await urlSession.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
@@ -825,5 +828,39 @@ struct TMDBCastMember: Codable {
         case originalName = "original_name"
         case popularity
         case profilePath = "profile_path"
+    }
+}
+
+// MARK: - Media Server Not Exists API
+
+extension APIService {
+    /// 获取不存在的剧集信息（仅用于 TMDB 电视剧）
+    func getNotExistsEpisodes(mediaDetail: MediaDetail) async throws -> [NotExistsResponse] {
+        let endpoint = "/api/v1/mediaserver/notexists"
+        var request = try createRequest(endpoint: endpoint, method: "POST")
+        
+        // 发送完整的 MediaDetail 作为载荷
+        request.httpBody = try JSONEncoder().encode(mediaDetail)
+        
+        // 不使用缓存，确保获取最新数据
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        
+        return try await performRequest(request)
+    }
+}
+
+// MARK: - Not Exists Response Models
+
+struct NotExistsResponse: Codable {
+    let season: Int
+    let episodes: [Int]
+    let totalEpisode: Int
+    let startEpisode: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case season
+        case episodes
+        case totalEpisode = "total_episode"
+        case startEpisode = "start_episode"
     }
 }

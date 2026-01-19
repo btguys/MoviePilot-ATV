@@ -381,7 +381,9 @@ struct MediaDetailView: View {
                                         .frame(maxWidth: 380, alignment: .leading)
                                 }
 
-                                let hasSeasonCards = !(detail.seasons?.isEmpty ?? true)
+                                // 订阅按钮显示条件：只有非TMDB来源的电视剧才隐藏
+                                // TMDB来源的电视剧在季卡片上处理订阅，电影和豆瓣来源的内容在此处显示订阅按钮
+                                let shouldShowSubscribeButton = !(detail.source?.lowercased().contains("tmdb") == true && detail.type == "电视剧")
 
                                 HStack(spacing: 15) {
                                     Button(action: { viewModel.searchResources() }) {
@@ -400,7 +402,7 @@ struct MediaDetailView: View {
                                     .focused($focusedButtonArea, equals: .searchButton)
                                     .disabled(viewModel.isSearching)
 
-                                    if !hasSeasonCards {
+                                    if shouldShowSubscribeButton {
                                         Button(action: { viewModel.subscribe() }) {
                                             HStack(spacing: 8) {
                                                 if viewModel.isSubscribing {

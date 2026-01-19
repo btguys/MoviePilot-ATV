@@ -123,6 +123,11 @@ class MediaDetailViewModel: ObservableObject {
             print("✅ [MediaDetailVM] 详情加载成功 - \(mediaDetail?.title ?? "未知标题")")
             seasonsExistData = mediaDetail?.seasons ?? [:]
             
+            // 如果是 TMDB 来源的电视剧，获取不存在的剧集信息
+            if source == "tmdb" && typeName == "电视剧", let detail = mediaDetail {
+                await loadNotExistsData(for: detail)
+            }
+            
             // 如果是 TMDB 来源，加载演职人员信息
             if source == "tmdb", let tmdbId = Int(id) {
                 await loadCredits(tmdbId: tmdbId, mediaType: typeName)
@@ -541,6 +546,94 @@ class MediaDetailViewModel: ObservableObject {
         searchCompleteTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] _ in
             self?.showSearchProgress = false
             print("✅ [MediaDetailVM] 搜索进度框延迟500ms后已关闭")
+        }
+    }
+    
+    // 加载不存在的剧集数据（仅用于 TMDB 电视剧）
+    private func loadNotExistsData(for detail: MediaDetail) async {
+        do {
+            print("🔵 [MediaDetailVM] 加载不存在剧集数据 - 标题: \(detail.title)")
+            let notExistsData = try await apiService.getNotExistsEpisodes(mediaDetail: detail)
+            
+            // 输出完整的 API 响应数据用于排查
+            print("📊 [MediaDetailVM] /api/v1/mediaserver/notexists 响应数据:")
+            if notExistsData.isEmpty {
+                print("   响应: [] (空数组)")
+            } else {
+                for (index, item) in notExistsData.enumerated() {
+                    print("   [\(index)] 季: \(item.season), 总剧集数: \(item.totalEpisode), 开始缺失剧集: \(item.startEpisode), 缺失剧集列表: \(item.episodes)")
+                }
+            }
+            
+            if notExistsData.isEmpty {
+                print("✅ [MediaDetailVM] 所有季都已入库")
+                // 清空 seasonsExistData，表示所有季都存在
+                seasonsExistData = [:]
+            } else {
+                print("⚠️ [MediaDetailVM] 发现缺失剧集: \(notExistsData.count) 个季有缺失")
+                
+                // 输出原始 seasons 数据用于对比
+                if let seasons = detail.seasons {
+                    print("📋 [MediaDetailVM] 原始 seasons 数据:")
+                    for (seasonKey, episodes) in seasons.sorted(by: { $0.key < $1.key }) {
+                        print("   季 \(seasonKey): \(episodes.count) 集 - \(episodes)")
+                    }
+                }
+                
+                // 将缺失数据转换为 seasonsExistData 格式
+                var existData: [String: [Int]] = [:]
+                
+                // 首先填充所有季的完整剧集列表
+                if let seasons = detail.seasons {
+                    for (seasonKey, episodes) in seasons {
+                        existData[seasonKey] = episodes
+                    }
+                }
+                
+                // 然后从每个季中移除缺失的剧集
+                for notExist in notExistsData {
+                    let seasonKey = String(notExist.season)
+                    if var existingEpisodes = existData[seasonKey] {
+                        print("🔄 [MediaDetailVM] 处理季 \(notExist.season) - 原始剧集数: \(existingEpisodes.count), start_episode: \(notExist.startEpisode), 缺失剧集列表: \(notExist.episodes)")
+                        
+                        // 根据 start_episode 判断缺失逻辑
+                        if notExist.startEpisode == 1 {
+                            // start_episode 为 1，表示整个季都缺失
+                            print("   整个季都缺失，清空剧集列表")
+                            existData[seasonKey] = []
+                        } else if notExist.startEpisode > 1 {
+                            // start_episode > 1，表示从该集开始缺失
+                            let missingStart = notExist.startEpisode
+                            print("   从第\(missingStart)集开始缺失")
+                            existingEpisodes.removeAll { $0 >= missingStart }
+                            existData[seasonKey] = existingEpisodes
+                        } else if !notExist.episodes.isEmpty {
+                            // 使用具体的缺失剧集列表
+                            print("   使用具体的缺失剧集列表")
+                            existingEpisodes.removeAll { notExist.episodes.contains($0) }
+                            existData[seasonKey] = existingEpisodes
+                        } else {
+                            print("   ⚠️ 未知的缺失模式: start_episode=\(notExist.startEpisode), episodes=\(notExist.episodes)")
+                        }
+                        
+                        print("   处理后剧集数: \(existData[seasonKey]?.count ?? 0), 剩余剧集: \(existData[seasonKey] ?? [])")
+                    } else {
+                        print("⚠️ [MediaDetailVM] 季 \(notExist.season) 在原始数据中不存在")
+                    }
+                }
+                
+                // 输出最终的 seasonsExistData
+                print("📋 [MediaDetailVM] 处理后的 seasonsExistData:")
+                for (seasonKey, episodes) in existData.sorted(by: { $0.key < $1.key }) {
+                    print("   季 \(seasonKey): \(episodes.count) 集 - \(episodes)")
+                }
+                
+                seasonsExistData = existData
+            }
+        } catch {
+            print("❌ [MediaDetailVM] 加载不存在剧集数据失败: \(error)")
+            // 失败时使用原始数据
+            seasonsExistData = detail.seasons ?? [:]
         }
     }
     
