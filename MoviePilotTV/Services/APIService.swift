@@ -382,6 +382,74 @@ class APIService {
         let _: EmptyResponse = try await performRequest(request)
     }
     
+    // 检查订阅状态
+    func checkSubscriptionStatus(source: String, id: String, title: String, season: Int = 0) async throws -> Bool {
+        let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let endpoint = "/api/v1/subscribe/media/\(source):\(id)?season=\(season)&title=\(encodedTitle)"
+
+        print("🔵 [APIService] 检查订阅状态: \(endpoint)")
+        var request = try createRequest(endpoint: endpoint)
+
+        // 禁用缓存，确保获取最新数据
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("❌ [APIService] 无效的响应类型")
+            throw APIError.invalidResponse
+        }
+
+        print("   HTTP Status: \(httpResponse.statusCode)")
+
+        // 检查是否是认证失败
+        if httpResponse.statusCode == 401 {
+            print("⚠️ [APIService] 未认证 (401) - Token 可能无效或已过期")
+            authManager.handleTokenExpired()
+            throw APIError.tokenExpired
+        }
+
+        // 检查是否是 token 过期
+        if httpResponse.statusCode == 403 {
+            if let responseString = String(data: data, encoding: .utf8),
+               responseString.contains("token校验不通过") {
+                print("⚠️ [APIService] Token 已过期")
+                authManager.handleTokenExpired()
+                throw APIError.tokenExpired
+            }
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            print("❌ [APIService] 服务器错误: \(httpResponse.statusCode)")
+            throw APIError.serverError(httpResponse.statusCode)
+        }
+
+        // 特殊处理订阅状态检查：API返回Subscription对象（已订阅）或null（未订阅）
+        if let responseString = String(data: data, encoding: .utf8) {
+            if responseString.trimmingCharacters(in: .whitespacesAndNewlines) == "null" {
+                print("✅ [APIService] 订阅状态检查成功: 未订阅 (返回null)")
+                return false
+            }
+
+            // 尝试解析为Subscription对象
+            do {
+                let decoder = JSONDecoder()
+                let subscription = try decoder.decode(Subscription.self, from: data)
+                let isSubscribed = subscription.id != 0 // 确保id不为0
+                print("✅ [APIService] 订阅状态检查成功: \(isSubscribed ? "已订阅 (ID: \(subscription.id))" : "未订阅")")
+                return isSubscribed
+            } catch {
+                print("❌ [APIService] 解析Subscription对象失败: \(error)")
+                print("   原始数据: \(responseString.prefix(500))")
+                // 如果解析失败，默认认为未订阅
+                return false
+            }
+        } else {
+            print("❌ [APIService] 无法读取响应数据")
+            return false
+        }
+    }
+    
     // MARK: - Episode API
     
     /// 获取剧集详情列表

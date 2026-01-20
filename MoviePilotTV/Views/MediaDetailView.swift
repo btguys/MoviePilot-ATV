@@ -381,9 +381,14 @@ struct MediaDetailView: View {
                                         .frame(maxWidth: 380, alignment: .leading)
                                 }
 
-                                // 订阅按钮显示条件：只有非TMDB来源的电视剧才隐藏
+                                // 订阅按钮显示条件：只有TMDB来源的电视剧才隐藏
                                 // TMDB来源的电视剧在季卡片上处理订阅，电影和豆瓣来源的内容在此处显示订阅按钮
-                                let shouldShowSubscribeButton = !(detail.source?.lowercased().contains("tmdb") == true && detail.type == "电视剧")
+                                let shouldShowSubscribeButton = !(detail.source?.lowercased() == "themoviedb" && detail.type == "电视剧")
+                                
+                                // 调试信息
+                                let _ = {
+                                    print("DEBUG: source = '\(detail.source ?? "nil")', type = '\(detail.type ?? "nil")', shouldShowSubscribeButton = \(shouldShowSubscribeButton)")
+                                }()
 
                                 HStack(spacing: 15) {
                                     Button(action: { viewModel.searchResources() }) {
@@ -410,12 +415,14 @@ struct MediaDetailView: View {
                                                 } else {
                                                     Image(systemName: viewModel.isSubscribed ? "heart.fill" : "heart")
                                                         .font(.system(size: 18))
+                                                        .foregroundColor(viewModel.isSubscribed ? .red : .yellow)
                                                 }
                                                 Text(viewModel.isSubscribed ? "已订阅" : "订阅")
                                                     .font(.system(size: 18, weight: .semibold))
+                                                    .foregroundColor(viewModel.isSubscribed ? .red : .yellow)
                                             }
                                             .frame(width: 140, height: 50)
-                                            .background(viewModel.isSubscribed ? Color.pink.opacity(0.9) : Color.purple.opacity(0.9))
+                                            .background(viewModel.isSubscribed ? Color.red.opacity(0.2) : Color.yellow.opacity(0.2))
                                             .cornerRadius(10)
                                         }
                                         .buttonStyle(ScaleFocusButtonStyle())

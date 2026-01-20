@@ -123,9 +123,15 @@ class MediaDetailViewModel: ObservableObject {
             print("✅ [MediaDetailVM] 详情加载成功 - \(mediaDetail?.title ?? "未知标题")")
             seasonsExistData = mediaDetail?.seasons ?? [:]
             
+            // 如果是电影，检查订阅状态
+            if typeName == "电影", let detail = mediaDetail {
+                await checkMovieSubscriptionStatus(source: source, id: id, title: detail.title)
+            }
+            
             // 如果是 TMDB 来源的电视剧，获取不存在的剧集信息
             if source == "tmdb" && typeName == "电视剧", let detail = mediaDetail {
                 await loadNotExistsData(for: detail)
+                await checkSeasonSubscriptionStatus(source: source, id: id, title: detail.title)
             }
             
             // 如果是 TMDB 来源，加载演职人员信息
@@ -151,6 +157,66 @@ class MediaDetailViewModel: ObservableObject {
         } catch {
             print("❌ [MediaDetailVM] 演职人员加载失败: \(error)")
             // 不显示错误，因为演职人员不是必需的
+        }
+    }
+    
+    // 检查季订阅状态
+    private func checkSeasonSubscriptionStatus(source: String, id: String, title: String) async {
+        guard let seasons = mediaDetail?.seasons, !seasons.isEmpty else {
+            print("🔵 [MediaDetailVM] 无季信息，跳过季订阅状态检查")
+            return
+        }
+        
+        print("🔵 [MediaDetailVM] 检查季订阅状态 - 共 \(seasons.count) 季")
+        
+        // 并发检查所有季的订阅状态
+        await withTaskGroup(of: (Int, Bool).self) { group in
+            for (seasonKey, _) in seasons {
+                if let seasonNumber = Int(seasonKey.replacingOccurrences(of: "第", with: "").replacingOccurrences(of: "季", with: "")) {
+                    group.addTask {
+                        do {
+                            let isSubscribed = try await self.apiService.checkSubscriptionStatus(
+                                source: source,
+                                id: id,
+                                title: title,
+                                season: seasonNumber
+                            )
+                            return (seasonNumber, isSubscribed)
+                        } catch {
+                            print("❌ [MediaDetailVM] 检查第\(seasonNumber)季订阅状态失败: \(error)")
+                            return (seasonNumber, false)
+                        }
+                    }
+                }
+            }
+            
+            // 收集结果
+            for await (seasonNumber, isSubscribed) in group {
+                await MainActor.run {
+                    self.seasonSubscriptionStatus[seasonNumber] = isSubscribed
+                    print("✅ [MediaDetailVM] 第\(seasonNumber)季订阅状态: \(isSubscribed ? "已订阅" : "未订阅")")
+                }
+            }
+        }
+        
+        print("✅ [MediaDetailVM] 所有季订阅状态检查完成")
+    }
+    
+    // 检查电影订阅状态
+    private func checkMovieSubscriptionStatus(source: String, id: String, title: String) async {
+        do {
+            print("🔵 [MediaDetailVM] 检查电影订阅状态 - 来源: \(source), ID: \(id), 标题: \(title)")
+            let isSubscribed = try await apiService.checkSubscriptionStatus(source: source, id: id, title: title, season: 0)
+            await MainActor.run {
+                self.isSubscribed = isSubscribed
+                print("✅ [MediaDetailVM] 电影订阅状态: \(isSubscribed ? "已订阅" : "未订阅")")
+            }
+        } catch {
+            print("❌ [MediaDetailVM] 检查电影订阅状态失败: \(error)")
+            // 失败时默认为未订阅
+            await MainActor.run {
+                self.isSubscribed = false
+            }
         }
     }
     
