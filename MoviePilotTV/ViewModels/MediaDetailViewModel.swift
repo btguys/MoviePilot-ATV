@@ -46,6 +46,7 @@ class MediaDetailViewModel: ObservableObject {
     @Published var visibleSearchResults: [Torrent] = []
     @Published var scrollToResultsNonce = UUID()
     @Published var isSubscribed = false
+    @Published var currentSubscriptionId: Int? = nil
     @Published var seasonSubscriptionStatus: [Int: Bool] = [:]
     @Published var seasonsExistData: [String: [Int]] = [:]
     @Published var episodes: [Episode] = []
@@ -175,7 +176,7 @@ class MediaDetailViewModel: ObservableObject {
                 if let seasonNumber = Int(seasonKey.replacingOccurrences(of: "第", with: "").replacingOccurrences(of: "季", with: "")) {
                     group.addTask {
                         do {
-                            let isSubscribed = try await self.apiService.checkSubscriptionStatus(
+                            let (isSubscribed, _) = try await self.apiService.checkSubscriptionStatus(
                                 source: source,
                                 id: id,
                                 title: title,
@@ -206,16 +207,18 @@ class MediaDetailViewModel: ObservableObject {
     private func checkMovieSubscriptionStatus(source: String, id: String, title: String) async {
         do {
             print("🔵 [MediaDetailVM] 检查电影订阅状态 - 来源: \(source), ID: \(id), 标题: \(title)")
-            let isSubscribed = try await apiService.checkSubscriptionStatus(source: source, id: id, title: title, season: 0)
+            let (isSubscribed, subscriptionId) = try await apiService.checkSubscriptionStatus(source: source, id: id, title: title, season: 0)
             await MainActor.run {
                 self.isSubscribed = isSubscribed
-                print("✅ [MediaDetailVM] 电影订阅状态: \(isSubscribed ? "已订阅" : "未订阅")")
+                self.currentSubscriptionId = subscriptionId
+                print("✅ [MediaDetailVM] 电影订阅状态: \(isSubscribed ? "已订阅 (ID: \(subscriptionId ?? 0))" : "未订阅")")
             }
         } catch {
             print("❌ [MediaDetailVM] 检查电影订阅状态失败: \(error)")
             // 失败时默认为未订阅
             await MainActor.run {
                 self.isSubscribed = false
+                self.currentSubscriptionId = nil
             }
         }
     }
@@ -477,13 +480,24 @@ class MediaDetailViewModel: ObservableObject {
         }
     }
     
-    // 订阅
-    func subscribe() {
+    // 订阅/取消订阅切换
+    func toggleSubscription() {
         guard let detail = mediaDetail else { return }
         
         Task {
-            await performSubscribe(detail: detail)
+            if isSubscribed, let subscriptionId = currentSubscriptionId {
+                // 已订阅，执行取消订阅
+                await performUnsubscribe(subscriptionId: subscriptionId, title: detail.title)
+            } else {
+                // 未订阅，执行订阅
+                await performSubscribe(detail: detail)
+            }
         }
+    }
+    
+    // 订阅（兼容旧方法名）
+    func subscribe() {
+        toggleSubscription()
     }
     
     private func performSubscribe(detail: MediaDetail) async {
@@ -509,6 +523,27 @@ class MediaDetailViewModel: ObservableObject {
         } catch {
             print("❌ [MediaDetailVM] 订阅失败: \(error)")
             errorMessage = "订阅失败: \(error.localizedDescription)"
+            showError = true
+        }
+    }
+    
+    private func performUnsubscribe(subscriptionId: Int, title: String) async {
+        isSubscribing = true
+        defer { isSubscribing = false }
+        
+        do {
+            print("🔵 [MediaDetailVM] 取消订阅: \(title) (ID: \(subscriptionId))")
+            
+            try await apiService.deleteSubscription(id: subscriptionId)
+            
+            print("✅ [MediaDetailVM] 取消订阅成功")
+            successMessage = "已成功取消订阅《\(title)》"
+            showSuccessAlert = true
+            isSubscribed = false
+            currentSubscriptionId = nil
+        } catch {
+            print("❌ [MediaDetailVM] 取消订阅失败: \(error)")
+            errorMessage = "取消订阅失败: \(error.localizedDescription)"
             showError = true
         }
     }

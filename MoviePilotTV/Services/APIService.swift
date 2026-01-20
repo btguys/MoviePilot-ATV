@@ -383,7 +383,7 @@ class APIService {
     }
     
     // 检查订阅状态
-    func checkSubscriptionStatus(source: String, id: String, title: String, season: Int = 0) async throws -> Bool {
+    func checkSubscriptionStatus(source: String, id: String, title: String, season: Int = 0) async throws -> (isSubscribed: Bool, subscriptionId: Int?) {
         let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let endpoint = "/api/v1/subscribe/media/\(source):\(id)?season=\(season)&title=\(encodedTitle)"
 
@@ -428,7 +428,7 @@ class APIService {
         if let responseString = String(data: data, encoding: .utf8) {
             if responseString.trimmingCharacters(in: .whitespacesAndNewlines) == "null" {
                 print("✅ [APIService] 订阅状态检查成功: 未订阅 (返回null)")
-                return false
+                return (false, nil)
             }
 
             // 尝试解析为Subscription对象
@@ -437,16 +437,16 @@ class APIService {
                 let subscription = try decoder.decode(Subscription.self, from: data)
                 let isSubscribed = (subscription.id ?? 0) != 0 // id为nil或0都视为未订阅
                 print("✅ [APIService] 订阅状态检查成功: \(isSubscribed ? "已订阅 (ID: \(subscription.id ?? 0))" : "未订阅")")
-                return isSubscribed
+                return (isSubscribed, subscription.id)
             } catch {
                 print("❌ [APIService] 解析Subscription对象失败: \(error)")
                 print("   原始数据: \(responseString.prefix(500))")
                 // 如果解析失败，默认认为未订阅
-                return false
+                return (false, nil)
             }
         } else {
             print("❌ [APIService] 无法读取响应数据")
-            return false
+            return (false, nil)
         }
     }
     
