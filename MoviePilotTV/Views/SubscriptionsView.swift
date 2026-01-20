@@ -125,8 +125,11 @@ struct SubscriptionsView: View {
         }
         .onChange(of: viewModel.filteredSubscriptions) { _ in
             // 当订阅列表更改时，更新第一张卡片的 ID
-            if let firstSubscription = viewModel.filteredSubscriptions.first {
-                firstCardId = String(firstSubscription.id)
+            if let firstSubscription = viewModel.filteredSubscriptions.first,
+               let id = firstSubscription.id {
+                firstCardId = String(id)
+            } else {
+                firstCardId = ""
             }
         }
         .alert("错误", isPresented: $viewModel.showError) {
@@ -206,10 +209,10 @@ struct SubscriptionsView: View {
                 SubscriptionCardContent(subscription: subscription)
             }
             .buttonStyle(.card)
-            .focused($focusedCard, equals: String(subscription.id))
+            .focused($focusedCard, equals: String(subscription.id ?? 0))
             .onChange(of: focusedCard, initial: false) { oldValue, newValue in
-                if newValue == String(subscription.id) {
-                    focusedCardId = String(subscription.id)
+                if newValue == String(subscription.id ?? 0) {
+                    focusedCardId = String(subscription.id ?? 0)
                 }
             }
         }
@@ -299,7 +302,7 @@ struct SubscriptionCardContent: View {
             
             // Title
             Text(subscription.name)
-                .font(.system(size: 18, weight: .medium))
+                .font(.system(size: 19, weight: .medium))
                 .foregroundColor(.white)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)

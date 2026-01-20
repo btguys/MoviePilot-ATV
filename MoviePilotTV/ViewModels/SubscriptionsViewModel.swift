@@ -48,14 +48,17 @@ class SubscriptionsViewModel: ObservableObject {
     }
     
     func deleteSubscription(_ subscription: Subscription) {
+        guard let id = subscription.id else {
+            errorMessage = "订阅ID无效，无法删除。"
+            showError = true
+            return
+        }
         Task {
             do {
-                try await apiService.deleteSubscription(id: subscription.id)
-                
+                try await apiService.deleteSubscription(id: id)
                 // Remove from local list
-                subscriptions.removeAll { $0.id == subscription.id }
+                subscriptions.removeAll { $0.id == id }
                 filterSubscriptions(by: currentFilter)
-                
             } catch {
                 errorMessage = "删除订阅失败: \(error.localizedDescription)"
                 showError = true

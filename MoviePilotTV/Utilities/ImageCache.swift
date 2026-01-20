@@ -21,7 +21,7 @@ class ImageCache {
             try? fileManager.createDirectory(atPath: diskCachePath, withIntermediateDirectories: true)
         }
         
-        print("🖼️ [ImageCache] 已初始化 - 内存: 500MB, 磁盘路径: \(diskCachePath)")
+        // print("🖼️ [ImageCache] 已初始化 - 内存: 500MB, 磁盘路径: \(diskCachePath)")
     }
     
     // 获取缓存（先查内存，再查磁盘）
@@ -30,13 +30,13 @@ class ImageCache {
         
         // 1. 优先查询内存缓存
         if let image = memoryCache.object(forKey: cacheKey) {
-            print("✅ [ImageCache] 内存命中: \(key.prefix(50))...")
+            // print("✅ [ImageCache] 内存命中: \(key.prefix(50))...")
             return image
         }
         
         // 2. 查询磁盘缓存
         if let diskImage = getDiskImage(forKey: key) {
-            print("✅ [ImageCache] 磁盘命中: \(key.prefix(50))...")
+            // print("✅ [ImageCache] 磁盘命中: \(key.prefix(50))...")
             // 恢复到内存缓存
             memoryCache.setObject(diskImage, forKey: cacheKey)
             return diskImage
@@ -77,7 +77,7 @@ class ImageCache {
         // 使用 JPEG 格式，质量 85%
         if let data = image.jpegData(compressionQuality: 0.85) {
             try? data.write(to: URL(fileURLWithPath: filePath))
-            print("💾 [ImageCache] 已保存至磁盘: \(key.prefix(30))")
+            // print("💾 [ImageCache] 已保存至磁盘: \(key.prefix(30))")
         }
     }
     
@@ -92,7 +92,7 @@ class ImageCache {
         memoryCache.removeAllObjects()
         try? fileManager.removeItem(atPath: diskCachePath)
         try? fileManager.createDirectory(atPath: diskCachePath, withIntermediateDirectories: true)
-        print("🗑️ [ImageCache] 已清空所有缓存")
+        // print("🗑️ [ImageCache] 已清空所有缓存")
     }
     
     // 获取缓存大小

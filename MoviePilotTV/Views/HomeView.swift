@@ -261,7 +261,7 @@ struct FeaturedMediaCard: View {
                 
                 if let overview = media.overview {
                     Text(overview)
-                        .font(.system(size: 15))
+                        .font(.system(size: 24))
                         .foregroundColor(.white.opacity(0.9))
                         .lineLimit(3)
                         .frame(maxWidth: 700, alignment: .leading)
@@ -383,7 +383,7 @@ struct MediaCard: View {
             
             // Title
             Text(media.title)
-                .font(.system(size: 18, weight: .medium))
+                .font(.system(size: 19, weight: .medium))
                 .foregroundColor(.white)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)

@@ -435,8 +435,8 @@ class APIService {
             do {
                 let decoder = JSONDecoder()
                 let subscription = try decoder.decode(Subscription.self, from: data)
-                let isSubscribed = subscription.id != 0 // 确保id不为0
-                print("✅ [APIService] 订阅状态检查成功: \(isSubscribed ? "已订阅 (ID: \(subscription.id))" : "未订阅")")
+                let isSubscribed = (subscription.id ?? 0) != 0 // id为nil或0都视为未订阅
+                print("✅ [APIService] 订阅状态检查成功: \(isSubscribed ? "已订阅 (ID: \(subscription.id ?? 0))" : "未订阅")")
                 return isSubscribed
             } catch {
                 print("❌ [APIService] 解析Subscription对象失败: \(error)")

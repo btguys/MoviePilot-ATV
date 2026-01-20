@@ -71,7 +71,7 @@ class ImageLoader: ObservableObject {
         if let cachedImage = ImageCache.shared.get(forKey: url.absoluteString) {
             self.image = cachedImage
             self.loadingState = .success(cachedImage)
-            print("✅ [ImageLoader] 缓存命中: \(url.absoluteString.prefix(50))...")
+            // print("✅ [ImageLoader] 缓存命中: \(url.absoluteString.prefix(50))...")
             return
         }
         
@@ -79,14 +79,14 @@ class ImageLoader: ObservableObject {
         if ImageLoaderCache.shared.isLoading(url: url) {
             self.isLoading = true
             self.loadingState = .loading()
-            print("🔄 [ImageLoader] 请求去重：已在加载中 \(url.absoluteString.prefix(50))...")
+            // print("🔄 [ImageLoader] 请求去重：已在加载中 \(url.absoluteString.prefix(50))...")
             return
         }
         
         // 3. 开始加载
         self.isLoading = true
         self.loadingState = .loading()
-        print("📥 [ImageLoader] 开始加载: \(url.absoluteString.prefix(50))...")
+        // print("📥 [ImageLoader] 开始加载: \(url.absoluteString.prefix(50))...")
         
         let cancellable = urlSession.dataTaskPublisher(for: url)
             .tryMap { data, response in
@@ -107,7 +107,7 @@ class ImageLoader: ObservableObject {
                     case .failure(let error):
                         self?.error = error
                         self?.loadingState = .failure(error)
-                        print("❌ [ImageLoader] 加载失败: \(error.localizedDescription)")
+                        // print("❌ [ImageLoader] 加载失败: \(error.localizedDescription)")
                     case .finished:
                         break
                     }
@@ -117,12 +117,12 @@ class ImageLoader: ObservableObject {
                         self?.image = image
                         self?.loadingState = .success(image)
                         ImageCache.shared.set(image, forKey: url.absoluteString)
-                        print("✅ [ImageLoader] 加载成功: \(url.absoluteString.prefix(50))...")
+                        // print("✅ [ImageLoader] 加载成功: \(url.absoluteString.prefix(50))...")
                     } else {
                         let error = NSError(domain: "ImageLoader", code: -1, userInfo: [NSLocalizedDescriptionKey: "无法解码图片"])
                         self?.error = error
                         self?.loadingState = .failure(error)
-                        print("❌ [ImageLoader] 解码失败")
+                        // print("❌ [ImageLoader] 解码失败")
                     }
                 }
             )

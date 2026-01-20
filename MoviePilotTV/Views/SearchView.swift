@@ -28,7 +28,7 @@ struct SearchView: View {
                         
                         TextField("输入电影或电视剧名称", text: $viewModel.searchQuery)
                             .textFieldStyle(PlainTextFieldStyle())
-                            .font(.system(size: 18))
+                            .font(.system(size: 20))
                             .foregroundColor(.white)
                             .focused($isSearchFieldFocused)
                             .onSubmit {
@@ -66,7 +66,7 @@ struct SearchView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             .scaleEffect(1.5)
                         Text("搜索中...")
-                            .font(.system(size: 16))
+                            .font(.system(size: 18))
                             .foregroundColor(.gray)
                             .padding(.top, 20)
                     }
@@ -109,6 +109,7 @@ struct SearchView: View {
                     }
                     .padding(.horizontal, 90)
                     .padding(.vertical, 44) // 为放大预留更多上下空间，避免裁切
+                    .focusSection()  // 添加焦点区域
                     
                     // Bottom spacing
                     Color.clear.frame(height: 60)
@@ -117,7 +118,16 @@ struct SearchView: View {
         }
         .background(Color.black)
         .onAppear {
-            isSearchFieldFocused = true
+            // 只有在没有搜索结果时才自动聚焦搜索框
+            if viewModel.searchResults.isEmpty {
+                isSearchFieldFocused = true
+            }
+        }
+        .onChange(of: viewModel.searchResults) { oldValue, newValue in
+            // 当搜索结果从有变为无时，重新聚焦搜索框
+            if oldValue.count > 0 && newValue.isEmpty {
+                isSearchFieldFocused = true
+            }
         }
         .alert("错误", isPresented: $viewModel.showError) {
             Button("确定", role: .cancel) { }

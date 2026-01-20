@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 @MainActor
 class SearchViewModel: ObservableObject {
@@ -20,23 +19,6 @@ class SearchViewModel: ObservableObject {
     
     private let apiService = APIService.shared
     private var searchTask: Task<Void, Never>?
-    
-    init() {
-        // Auto-search with debounce
-        $searchQuery
-            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
-            .removeDuplicates()
-            .sink { [weak self] query in
-                guard let self = self, !query.isEmpty else {
-                    self?.searchResults = []
-                    return
-                }
-                self.performSearch()
-            }
-            .store(in: &cancellables)
-    }
-    
-    private var cancellables = Set<AnyCancellable>()
     
     func performSearch() {
         guard !searchQuery.isEmpty else {

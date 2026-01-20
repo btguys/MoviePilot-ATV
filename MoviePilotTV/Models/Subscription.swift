@@ -8,7 +8,7 @@
 import Foundation
 
 struct Subscription: Codable, Identifiable, Equatable {
-    let id: Int
+    let id: Int?
     let name: String
     let year: String?
     let type: String // "电影" or "电视剧"

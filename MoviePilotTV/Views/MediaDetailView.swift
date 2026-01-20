@@ -173,10 +173,10 @@ struct MediaDetailView: View {
             } else {
                 VStack(spacing: 20) {
                     Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: 60))
+                        .font(.system(size: 62))
                         .foregroundColor(.gray)
                     Text("加载详情失败")
-                        .font(.system(size: 24))
+                        .font(.system(size: 26))
                 }
             }
         }
@@ -326,9 +326,9 @@ struct MediaDetailView: View {
                         Button(action: { dismiss() }) {
                             HStack(spacing: 10) {
                                 Image(systemName: "chevron.left")
-                                    .font(.system(size: 20, weight: .medium))
+                                    .font(.system(size: 22, weight: .medium))
                                 Text("返回")
-                                    .font(.system(size: 18, weight: .regular))
+                                    .font(.system(size: 20, weight: .regular))
                             }
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)
@@ -368,14 +368,14 @@ struct MediaDetailView: View {
 
                             VStack(alignment: .leading, spacing: 12) {
                                 Text(detail.title)
-                                    .font(.system(size: 32, weight: .bold))
+                                    .font(.system(size: 34, weight: .bold))
                                     .foregroundColor(.white)
                                     .lineLimit(2)
                                     .frame(maxWidth: 380, alignment: .leading)
 
                                 if let originalTitle = detail.originalTitle, originalTitle != detail.title {
                                     Text(originalTitle)
-                                        .font(.system(size: 18))
+                                        .font(.system(size: 20))
                                         .foregroundColor(.white.opacity(0.7))
                                         .lineLimit(1)
                                         .frame(maxWidth: 380, alignment: .leading)
@@ -390,15 +390,16 @@ struct MediaDetailView: View {
                                     print("DEBUG: source = '\(detail.source ?? "nil")', type = '\(detail.type ?? "nil")', shouldShowSubscribeButton = \(shouldShowSubscribeButton)")
                                 }()
 
-                                HStack(spacing: 15) {
+                                HStack(spacing: 25) {
                                     Button(action: { viewModel.searchResources() }) {
-                                        HStack(spacing: 8) {
+                                        HStack(spacing: 2) {
                                             Image(systemName: "magnifyingglass")
-                                                .font(.system(size: 18))
+                                                .font(.system(size: 20))
                                             Text("搜索资源")
-                                                .font(.system(size: 18, weight: .semibold))
+                                                .font(.system(size: 20, weight: .semibold))
                                         }
-                                        .frame(width: 180, height: 50)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 12)
                                         .background(Color.white.opacity(0.2))
                                         .cornerRadius(10)
                                     }
@@ -409,19 +410,20 @@ struct MediaDetailView: View {
 
                                     if shouldShowSubscribeButton {
                                         Button(action: { viewModel.subscribe() }) {
-                                            HStack(spacing: 8) {
+                                            HStack(spacing: 2) {
                                                 if viewModel.isSubscribing {
                                                     ProgressView()
                                                 } else {
                                                     Image(systemName: viewModel.isSubscribed ? "heart.fill" : "heart")
-                                                        .font(.system(size: 18))
+                                                        .font(.system(size: 20))
                                                         .foregroundColor(viewModel.isSubscribed ? .red : .yellow)
                                                 }
                                                 Text(viewModel.isSubscribed ? "已订阅" : "订阅")
-                                                    .font(.system(size: 18, weight: .semibold))
+                                                    .font(.system(size: 20, weight: .semibold))
                                                     .foregroundColor(viewModel.isSubscribed ? .red : .yellow)
                                             }
-                                            .frame(width: 140, height: 50)
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 12)
                                             .background(viewModel.isSubscribed ? Color.red.opacity(0.2) : Color.yellow.opacity(0.2))
                                             .cornerRadius(10)
                                         }
@@ -452,18 +454,19 @@ struct MediaDetailView: View {
                                             }
                                         }
                                     }) {
-                                        HStack(spacing: 8) {
+                                        HStack(spacing: 2) {
                                             if tmdbLookupInProgress {
                                                 ProgressView()
                                                     .scaleEffect(0.9)
                                             } else {
                                                 Image(systemName: "play.circle.fill")
-                                                    .font(.system(size: 18))
+                                                    .font(.system(size: 20))
                                             }
                                             Text("Infuse播放")
-                                                .font(.system(size: 18, weight: .semibold))
+                                                .font(.system(size: 20, weight: .semibold))
                                         }
-                                        .frame(width: 180, height: 50)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 12)
                                         .background(needsTmdbKey ? Color.gray.opacity(0.5) : Color.orange.opacity(0.9))
                                         .cornerRadius(10)
                                     }
@@ -489,21 +492,22 @@ struct MediaDetailView: View {
                                     if let rating = detail.voteAverage {
                                         HStack(spacing: 4) {
                                             Image(systemName: "star.fill")
-                                                .font(.system(size: 16))
+                                                .font(.system(size: 18))
                                                 .foregroundColor(.yellow)
                                             Text(String(format: "%.1f", rating))
-                                                .font(.system(size: 18, weight: .semibold))
+                                                .font(.system(size: 20, weight: .semibold))
                                         }
                                     }
 
                                     if let year = detail.year {
                                         Text(year)
-                                            .font(.system(size: 18))
+                                            .font(.system(size: 20))
+                                            .foregroundColor(.white.opacity(0.8))
                                     }
 
                                     if let type = detail.type {
                                         Text(type)
-                                            .font(.system(size: 15))
+                                            .font(.system(size: 17))
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 4)
                                             .background(Color.blue.opacity(0.8))
@@ -512,7 +516,7 @@ struct MediaDetailView: View {
 
                                     if let lang = detail.originalLanguage {
                                         Text(lang.uppercased())
-                                            .font(.system(size: 15))
+                                            .font(.system(size: 17))
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 4)
                                             .background(Color.gray.opacity(0.6))
@@ -536,7 +540,7 @@ struct MediaDetailView: View {
                                 if let overview = detail.overview {
                                     Button(action: { isOverviewExpanded.toggle() }) {
                                         Text(overview)
-                                            .font(.system(size: 22))
+                                            .font(.system(size: 24))
                                             .foregroundColor(.white.opacity(0.9))
                                             .lineSpacing(6)
                                             .multilineTextAlignment(.leading)
@@ -578,7 +582,7 @@ struct MediaDetailView: View {
             if let cast = viewModel.credits?.cast, !cast.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("演员阵容")
-                        .font(.system(size: 30, weight: .bold))
+                        .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.white)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -624,7 +628,7 @@ struct MediaDetailView: View {
                                         
                                         // Name
                                         Text(member.name)
-                                            .font(.system(size: 16, weight: .semibold))
+                                            .font(.system(size: 18, weight: .semibold))
                                             .foregroundColor(.white)
                                             .lineLimit(1)
                                             .frame(width: 120)
@@ -632,7 +636,7 @@ struct MediaDetailView: View {
                                         // Character
                                         if let character = member.character {
                                             Text(character)
-                                                .font(.system(size: 14))
+                                                .font(.system(size: 16))
                                                 .foregroundColor(.white.opacity(0.7))
                                                 .lineLimit(2)
                                                 .multilineTextAlignment(.center)
@@ -712,7 +716,7 @@ struct MediaDetailView: View {
         if !seasonCards.isEmpty {
             VStack(alignment: .leading, spacing: 14) {
                 Text("季")
-                    .font(.system(size: 30, weight: .bold))
+                    .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.white)
                 
                 // 使用普通Grid而非LazyVGrid，确保立即渲染，让焦点系统能正确识别
@@ -760,7 +764,7 @@ struct MediaDetailView: View {
         if !items.isEmpty {
             VStack(alignment: .leading, spacing: 14) {
                 Text("主创团队")
-                    .font(.system(size: 30, weight: .bold))
+                    .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.white)
                 
                 // 使用普通Grid而非LazyVGrid，确保立即渲染
@@ -774,10 +778,10 @@ struct MediaDetailView: View {
                                     Button(action: {}) {
                                         VStack(alignment: .leading, spacing: 6) {
                                             Text(item.role)
-                                                .font(.system(size: 16, weight: .semibold))
+                                                .font(.system(size: 18, weight: .semibold))
                                                 .foregroundColor(.white.opacity(0.9))
                                             Text(item.name)
-                                                .font(.system(size: 18, weight: .semibold))
+                                                .font(.system(size: 20, weight: .semibold))
                                                 .foregroundColor(.white)
                                                 .lineLimit(1)
                                                 .multilineTextAlignment(.leading)
@@ -902,13 +906,13 @@ struct MediaDetailView: View {
                         .animation(.linear(duration: 0.3), value: viewModel.searchProgress)
                     
                     Text("\(Int(viewModel.searchProgress))%")
-                        .font(.system(size: 32, weight: .semibold))
+                        .font(.system(size: 34, weight: .semibold))
                         .foregroundColor(.white)
                 }
                 
                 // 进度文本
                 Text(viewModel.searchProgressText)
-                    .font(.system(size: 20))
+                    .font(.system(size: 22))
                     .foregroundColor(.white.opacity(0.9))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 600)
@@ -934,7 +938,7 @@ struct MediaDetailView: View {
                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     .scaleEffect(1.4)
                 Text("正在提交下载请求…")
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 24, weight: .semibold))
                     .foregroundColor(.white)
             }
             .padding(50)
@@ -999,7 +1003,7 @@ struct MediaDetailView: View {
                     // 标题
                     if let title = torrent.title {
                         Text(title)
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 22, weight: .semibold))
                             .foregroundColor(.white)
                             .lineLimit(2)
                     }
@@ -1009,7 +1013,7 @@ struct MediaDetailView: View {
                     // 站点名称
                     if let siteName = torrent.torrentInfo?.siteName {
                         Text(siteName)
-                            .font(.system(size: 16))
+                            .font(.system(size: 18))
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
                             .background(Color.purple.opacity(0.3))
@@ -1023,7 +1027,7 @@ struct MediaDetailView: View {
                     // 文件大小
                     Label {
                         Text(torrent.sizeText)
-                            .font(.system(size: 16))
+                            .font(.system(size: 18))
                             .foregroundColor(.white.opacity(0.8))
                 } icon: {
                     Image(systemName: "internaldrive")
@@ -1034,7 +1038,7 @@ struct MediaDetailView: View {
                 if let seeders = torrent.torrentInfo?.seeders {
                     Label {
                         Text("\(seeders) 做种")
-                            .font(.system(size: 16))
+                            .font(.system(size: 18))
                             .foregroundColor(.white.opacity(0.8))
                     } icon: {
                         Image(systemName: "arrow.up.circle.fill")
@@ -1045,7 +1049,7 @@ struct MediaDetailView: View {
                 // 发布时间
                 Label {
                     Text(formatDate(torrent.pubdate))
-                        .font(.system(size: 16))
+                        .font(.system(size: 18))
                         .foregroundColor(.white.opacity(0.8))
                 } icon: {
                     Image(systemName: "clock")
@@ -1476,10 +1480,10 @@ struct MediaDetailView: View {
                 } else if viewModel.episodes.isEmpty {
                     VStack(spacing: 20) {
                         Image(systemName: "film")
-                            .font(.system(size: 60))
+                            .font(.system(size: 62))
                             .foregroundColor(.gray)
                         Text("暂无剧集信息")
-                            .font(.system(size: 24))
+                            .font(.system(size: 26))
                             .foregroundColor(.gray)
                     }
                     .frame(maxHeight: .infinity)
@@ -1602,30 +1606,30 @@ struct MediaDetailView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("第 \(episode.episodeNumber) 集")
-                            .font(.system(size: 20, weight: .bold))
+                            .font(.system(size: 22, weight: .bold))
                             .foregroundColor(.blue)
                         
                         Text(episode.name)
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(.system(size: 24, weight: .semibold))
                             .foregroundColor(.white)
                             .lineLimit(1)
                     }
                     
                     if let airDate = episode.airDate {
                         Text("首播：\(airDate)")
-                            .font(.system(size: 16))
+                            .font(.system(size: 18))
                             .foregroundColor(.white.opacity(0.6))
                     }
                     
                     if let overview = episode.overview, !overview.isEmpty {
                         Text(overview)
-                            .font(.system(size: 18))
+                            .font(.system(size: 20))
                             .foregroundColor(.white.opacity(0.8))
                             .lineLimit(nil)  // 改为不限制行数，聚焦时可以完整查看
                             .lineSpacing(4)
                     } else {
                         Text("暂无简介")
-                            .font(.system(size: 18))
+                            .font(.system(size: 20))
                             .foregroundColor(.white.opacity(0.5))
                             .italic()
                     }
@@ -1673,47 +1677,47 @@ struct MediaDetailView: View {
             }
             print("🔵 [MediaDetailView] ===== 按钮 Action 完成 =====")
         }) {
-            VStack(alignment: .leading, spacing: 10) {
-                // 状态标签行
-                HStack(spacing: 6) {
+            VStack(alignment: .center, spacing: 20) {
+                // 第一行：第x季 和 总集数，居中加大间距
+                HStack(spacing: 32) {  // 进一步加大间距
+                    Text(card.name)
+                        .font(.system(size: 21, weight: .semibold))  // 加大一号
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                    Text("\(card.episodeCount)集")
+                        .font(.system(size: 16))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .frame(maxWidth: .infinity, alignment: .center)  // 居中
+                
+                // 第二行：状态标签，加大间隔
+                HStack(spacing: 24) {  // 进一步加大间隔
                     // 下载状态标签
-                    HStack(spacing: 3) {
+                    HStack(spacing: 4) {  // 稍微加大内部间距
                         Circle()
                             .fill(card.downloadStatus.color)
-                            .frame(width: 6, height: 6)
+                            .frame(width: 7, height: 7)  // 稍微加大
                         Text(card.downloadStatus.text)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.system(size: 15, weight: .medium))  // 加大一号
                             .foregroundColor(card.downloadStatus.color)
                     }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, 10)  // 加大padding
+                    .padding(.vertical, 5)
                     .background(card.downloadStatus.color.opacity(0.15))
                     .cornerRadius(4)
                     
                     // 订阅状态标签
-                    HStack(spacing: 3) {
+                    HStack(spacing: 4) {
                         Image(systemName: card.isSubscribed ? "heart.fill" : "heart")
-                            .font(.system(size: 10))
+                            .font(.system(size: 11))  // 加大一号
                             .foregroundColor(card.isSubscribed ? .pink : .gray)
                     }
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
                     .background((card.isSubscribed ? Color.pink : Color.gray).opacity(0.15))
                     .cornerRadius(4)
-                    
-                    Spacer()
                 }
-                
-                // 季信息行
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(card.name)
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
-                        .lineLimit(1)
-                    Text("\(card.episodeCount)集")
-                        .font(.system(size: 14))
-                        .foregroundColor(.white.opacity(0.8))
-                }
+                .frame(maxWidth: .infinity, alignment: .center)  // 居中对齐
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)

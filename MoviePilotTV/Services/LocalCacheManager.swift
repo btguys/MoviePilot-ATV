@@ -39,7 +39,7 @@ class LocalCacheManager {
             try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
         }
         
-        print("💾 [LocalCacheManager] 已初始化 - 缓存路径: \(cacheDirectory.path)")
+        // print("💾 [LocalCacheManager] 已初始化 - 缓存路径: \(cacheDirectory.path)")
     }
     
     // MARK: - 首页数据缓存
@@ -127,9 +127,9 @@ class LocalCacheManager {
             let data = try JSONEncoder().encode(entry)
             let filePath = cacheDirectory.appendingPathComponent("\(CacheKey.tmdbLookup.key)_\(lookupKey)")
             try data.write(to: filePath)
-            print("💾 [LocalCacheManager] 已缓存 TMDB ID: \(tmdbId) key=\(lookupKey) 过期时间=\(entry.expireAt)")
+            // print("💾 [LocalCacheManager] 已缓存 TMDB ID: \(tmdbId) key=\(lookupKey) 过期时间=\(entry.expireAt)")
         } catch {
-            print("❌ [LocalCacheManager] 缓存 TMDB ID 失败 key=\(lookupKey): \(error.localizedDescription)")
+            // print("❌ [LocalCacheManager] 缓存 TMDB ID 失败 key=\(lookupKey): \(error.localizedDescription)")
         }
     }
 
@@ -141,10 +141,10 @@ class LocalCacheManager {
             let entry = try JSONDecoder().decode(TmdbLookupEntry.self, from: data)
             if entry.expireAt < Date() {
                 try? fileManager.removeItem(at: filePath)
-                print("⚠️ [LocalCacheManager] TMDB ID 缓存已过期 key=\(lookupKey)，已清理")
+                // print("⚠️ [LocalCacheManager] TMDB ID 缓存已过期 key=\(lookupKey)，已清理")
                 return nil
             }
-            print("✅ [LocalCacheManager] 命中 TMDB ID 缓存 key=\(lookupKey) -> \(entry.tmdbId)")
+            // print("✅ [LocalCacheManager] 命中 TMDB ID 缓存 key=\(lookupKey) -> \(entry.tmdbId)")
             return entry.tmdbId
         } catch {
             return nil
@@ -159,9 +159,9 @@ class LocalCacheManager {
             let data = try JSONEncoder().encode(media)
             let filePath = cacheDirectory.appendingPathComponent(key.key)
             try data.write(to: filePath)
-            print("💾 [LocalCacheManager] 已保存 \(key.key) - 共 \(media.count) 项")
+            // print("💾 [LocalCacheManager] 已保存 \(key.key) - 共 \(media.count) 项")
         } catch {
-            print("❌ [LocalCacheManager] 保存失败 \(key.key): \(error.localizedDescription)")
+            // print("❌ [LocalCacheManager] 保存失败 \(key.key): \(error.localizedDescription)")
         }
     }
     
@@ -171,10 +171,10 @@ class LocalCacheManager {
             let filePath = cacheDirectory.appendingPathComponent(key.key)
             let data = try Data(contentsOf: filePath)
             let media = try JSONDecoder().decode([MediaItem].self, from: data)
-            print("✅ [LocalCacheManager] 读取缓存 \(key.key) - 共 \(media.count) 项")
+            // print("✅ [LocalCacheManager] 读取缓存 \(key.key) - 共 \(media.count) 项")
             return media
         } catch {
-            print("⚠️ [LocalCacheManager] 读取缓存失败 \(key.key)")
+            // print("⚠️ [LocalCacheManager] 读取缓存失败 \(key.key)")
             return nil
         }
     }
@@ -185,9 +185,9 @@ class LocalCacheManager {
             let data = try JSONEncoder().encode(subscriptions)
             let filePath = cacheDirectory.appendingPathComponent(key.key)
             try data.write(to: filePath)
-            print("💾 [LocalCacheManager] 已保存 \(key.key) - 共 \(subscriptions.count) 项")
+            // print("💾 [LocalCacheManager] 已保存 \(key.key) - 共 \(subscriptions.count) 项")
         } catch {
-            print("❌ [LocalCacheManager] 保存失败 \(key.key): \(error.localizedDescription)")
+            // print("❌ [LocalCacheManager] 保存失败 \(key.key): \(error.localizedDescription)")
         }
     }
     
@@ -197,10 +197,10 @@ class LocalCacheManager {
             let filePath = cacheDirectory.appendingPathComponent(key.key)
             let data = try Data(contentsOf: filePath)
             let subscriptions = try JSONDecoder().decode([Subscription].self, from: data)
-            print("✅ [LocalCacheManager] 读取缓存 \(key.key) - 共 \(subscriptions.count) 项")
+            // print("✅ [LocalCacheManager] 读取缓存 \(key.key) - 共 \(subscriptions.count) 项")
             return subscriptions
         } catch {
-            print("⚠️ [LocalCacheManager] 读取缓存失败 \(key.key)")
+            // print("⚠️ [LocalCacheManager] 读取缓存失败 \(key.key)")
             return nil
         }
     }
@@ -211,9 +211,9 @@ class LocalCacheManager {
             let data = try JSONEncoder().encode(downloads)
             let filePath = cacheDirectory.appendingPathComponent(key.key)
             try data.write(to: filePath)
-            print("💾 [LocalCacheManager] 已保存 \(key.key) - 共 \(downloads.count) 项")
+                // print("💾 [LocalCacheManager] 已保存 \(key.key) - 共 \(downloads.count) 项")
         } catch {
-            print("❌ [LocalCacheManager] 保存失败 \(key.key): \(error.localizedDescription)")
+            // print("❌ [LocalCacheManager] 保存失败 \(key.key): \(error.localizedDescription)")
         }
     }
     
@@ -223,10 +223,10 @@ class LocalCacheManager {
             let filePath = cacheDirectory.appendingPathComponent(key.key)
             let data = try Data(contentsOf: filePath)
             let downloads = try JSONDecoder().decode([Download].self, from: data)
-            print("✅ [LocalCacheManager] 读取缓存 \(key.key) - 共 \(downloads.count) 项")
+                // print("✅ [LocalCacheManager] 读取缓存 \(key.key) - 共 \(downloads.count) 项")
             return downloads
         } catch {
-            print("⚠️ [LocalCacheManager] 读取缓存失败 \(key.key)")
+            // print("⚠️ [LocalCacheManager] 读取缓存失败 \(key.key)")
             return nil
         }
     }
@@ -235,7 +235,7 @@ class LocalCacheManager {
     func clearAll() {
         try? fileManager.removeItem(at: cacheDirectory)
         try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
-        print("🧹 [LocalCacheManager] 已清除所有缓存")
+        // print("🧹 [LocalCacheManager] 已清除所有缓存")
     }
     
     /// 获取缓存大小
