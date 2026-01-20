@@ -378,8 +378,24 @@ class APIService {
     }
     
     func deleteSubscription(id: Int) async throws {
+        print("🔵 [APIService] 取消订阅请求 - ID: \(id)")
         let request = try createRequest(endpoint: "/api/v1/subscribe/\(id)", method: "DELETE")
-        let _: EmptyResponse = try await performRequest(request)
+
+        // 取消订阅API应该返回包装格式 {"success":true,"message":null,"data":{}}
+        let response: MoviePilotResponse<EmptyResponse> = try await performRequest(request)
+
+        print("✅ [APIService] 取消订阅响应解析成功:")
+        print("   success: \(response.success)")
+        print("   message: \(response.message ?? "null")")
+        print("   data: \(String(describing: response.data))")
+
+        // 检查响应是否表示成功
+        guard response.success else {
+            print("❌ [APIService] 服务器返回取消订阅失败: \(response.message ?? "null")")
+            throw APIError.serverError(400) // 使用400表示业务逻辑错误
+        }
+
+        print("✅ [APIService] 取消订阅成功确认")
     }
     
     // 检查订阅状态
@@ -581,7 +597,7 @@ class APIService {
 // MoviePilot 标准响应包装
 struct MoviePilotResponse<T: Codable>: Codable {
     let success: Bool
-    let message: String
+    let message: String?
     let data: T?
 }
 

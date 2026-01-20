@@ -48,6 +48,7 @@ class MediaDetailViewModel: ObservableObject {
     @Published var isSubscribed = false
     @Published var currentSubscriptionId: Int? = nil
     @Published var seasonSubscriptionStatus: [Int: Bool] = [:]
+    @Published var seasonSubscriptionIds: [Int: Int] = [:] // 存储每个季的订阅ID
     @Published var seasonsExistData: [String: [Int]] = [:]
     @Published var episodes: [Episode] = []
     @Published var isLoadingEpisodes = false
@@ -171,31 +172,34 @@ class MediaDetailViewModel: ObservableObject {
         print("🔵 [MediaDetailVM] 检查季订阅状态 - 共 \(seasons.count) 季")
         
         // 并发检查所有季的订阅状态
-        await withTaskGroup(of: (Int, Bool).self) { group in
+        await withTaskGroup(of: (Int, Bool, Int?).self) { group in
             for (seasonKey, _) in seasons {
                 if let seasonNumber = Int(seasonKey.replacingOccurrences(of: "第", with: "").replacingOccurrences(of: "季", with: "")) {
                     group.addTask {
                         do {
-                            let (isSubscribed, _) = try await self.apiService.checkSubscriptionStatus(
+                            let (isSubscribed, subscriptionId) = try await self.apiService.checkSubscriptionStatus(
                                 source: source,
                                 id: id,
                                 title: title,
                                 season: seasonNumber
                             )
-                            return (seasonNumber, isSubscribed)
+                            return (seasonNumber, isSubscribed, subscriptionId)
                         } catch {
                             print("❌ [MediaDetailVM] 检查第\(seasonNumber)季订阅状态失败: \(error)")
-                            return (seasonNumber, false)
+                            return (seasonNumber, false, nil)
                         }
                     }
                 }
             }
             
             // 收集结果
-            for await (seasonNumber, isSubscribed) in group {
+            for await (seasonNumber, isSubscribed, subscriptionId) in group {
                 await MainActor.run {
                     self.seasonSubscriptionStatus[seasonNumber] = isSubscribed
-                    print("✅ [MediaDetailVM] 第\(seasonNumber)季订阅状态: \(isSubscribed ? "已订阅" : "未订阅")")
+                    if let id = subscriptionId {
+                        self.seasonSubscriptionIds[seasonNumber] = id
+                    }
+                    print("✅ [MediaDetailVM] 第\(seasonNumber)季订阅状态: \(isSubscribed ? "已订阅 (ID: \(subscriptionId ?? 0))" : "未订阅")")
                 }
             }
         }
@@ -448,34 +452,29 @@ class MediaDetailViewModel: ObservableObject {
     func toggleSeasonSubscription(seasonNumber: Int, isCurrentlySubscribed: Bool) async {
         guard let detail = mediaDetail else { return }
         
+        print("🔵 [MediaDetailVM] ===== 开始季订阅切换 =====")
+        print("🔵 [MediaDetailVM] 季号: \(seasonNumber), 当前状态: \(isCurrentlySubscribed ? "已订阅" : "未订阅")")
+        print("🔵 [MediaDetailVM] 媒体标题: \(detail.title)")
+        
         isSubscribing = true
-        defer { isSubscribing = false }
+        defer { 
+            isSubscribing = false
+            print("🔵 [MediaDetailVM] ===== 季订阅切换完成 =====")
+        }
         
         do {
             if isCurrentlySubscribed {
-                // 取消订阅逻辑（如果API支持）
-                print("🔵 [MediaDetailVM] 取消订阅季: \(detail.title) - 第\(seasonNumber)季")
-                // TODO: 调用取消订阅API（如果有）
-                seasonSubscriptionStatus[seasonNumber] = false
+                // 取消订阅此季
+                print("🔵 [MediaDetailVM] 执行取消订阅季操作")
+                await performSeasonUnsubscribe(seasonNumber: seasonNumber, title: detail.title)
             } else {
                 // 订阅此季
-                print("🔵 [MediaDetailVM] 订阅季: \(detail.title) - 第\(seasonNumber)季")
-                
-                try await apiService.subscribe(
-                    name: detail.title,
-                    type: detail.type ?? "电视剧",
-                    year: detail.year,
-                    tmdbId: detail.tmdbId,
-                    doubanId: detail.doubanId,
-                    season: seasonNumber
-                )
-                
-                print("✅ [MediaDetailVM] 订阅季成功")
-                seasonSubscriptionStatus[seasonNumber] = true
+                print("🔵 [MediaDetailVM] 执行订阅季操作")
+                await performSeasonSubscribe(seasonNumber: seasonNumber, detail: detail)
             }
         } catch {
-            print("❌ [MediaDetailVM] 订阅季失败: \(error)")
-            errorMessage = "订阅失败: \(error.localizedDescription)"
+            print("❌ [MediaDetailVM] 季订阅切换失败: \(error)")
+            errorMessage = "订阅操作失败: \(error.localizedDescription)"
             showError = true
         }
     }
@@ -523,6 +522,72 @@ class MediaDetailViewModel: ObservableObject {
         } catch {
             print("❌ [MediaDetailVM] 订阅失败: \(error)")
             errorMessage = "订阅失败: \(error.localizedDescription)"
+            showError = true
+        }
+    }
+    
+    private func performSeasonSubscribe(seasonNumber: Int, detail: MediaDetail) async {
+        do {
+            print("🔵 [MediaDetailVM] 调用API订阅季 - 标题: \(detail.title), 季: \(seasonNumber)")
+            
+            try await apiService.subscribe(
+                name: detail.title,
+                type: detail.type ?? "电视剧",
+                year: detail.year,
+                tmdbId: detail.tmdbId,
+                doubanId: detail.doubanId,
+                season: seasonNumber
+            )
+            
+            print("✅ [MediaDetailVM] 季订阅API调用成功")
+            successMessage = "已成功订阅《\(detail.title)》第\(seasonNumber)季"
+            showSuccessAlert = true
+            seasonSubscriptionStatus[seasonNumber] = true
+            
+            // 重新检查订阅状态以获取订阅ID
+            if let source = detail.tmdbId != nil ? "tmdb" : "douban",
+               let id = detail.tmdbId.map(String.init) ?? detail.doubanId {
+                print("🔵 [MediaDetailVM] 重新检查订阅状态以获取订阅ID")
+                let (isSubscribed, subscriptionId) = try await apiService.checkSubscriptionStatus(
+                    source: source,
+                    id: id,
+                    title: detail.title,
+                    season: seasonNumber
+                )
+                if let id = subscriptionId {
+                    seasonSubscriptionIds[seasonNumber] = id
+                    print("✅ [MediaDetailVM] 获取到季订阅ID: \(id)")
+                }
+            }
+        } catch {
+            print("❌ [MediaDetailVM] 季订阅失败: \(error)")
+            errorMessage = "订阅失败: \(error.localizedDescription)"
+            showError = true
+        }
+    }
+    
+    private func performSeasonUnsubscribe(seasonNumber: Int, title: String) async {
+        guard let subscriptionId = seasonSubscriptionIds[seasonNumber] else {
+            print("❌ [MediaDetailVM] 无法取消订阅季 - 没有找到订阅ID，季: \(seasonNumber)")
+            errorMessage = "无法取消订阅：未找到订阅记录"
+            showError = true
+            return
+        }
+        
+        do {
+            print("🔵 [MediaDetailVM] 调用API取消订阅季 - 标题: \(title), 季: \(seasonNumber), 订阅ID: \(subscriptionId)")
+            
+            try await apiService.deleteSubscription(id: subscriptionId)
+            
+            print("✅ [MediaDetailVM] 季取消订阅API调用成功")
+            successMessage = "已成功取消订阅《\(title)》第\(seasonNumber)季"
+            showSuccessAlert = true
+            seasonSubscriptionStatus[seasonNumber] = false
+            seasonSubscriptionIds[seasonNumber] = nil // 清除订阅ID
+            print("✅ [MediaDetailVM] 已清除季订阅ID记录")
+        } catch {
+            print("❌ [MediaDetailVM] 季取消订阅失败: \(error)")
+            errorMessage = "取消订阅失败: \(error.localizedDescription)"
             showError = true
         }
     }
