@@ -70,19 +70,19 @@ struct SystemStatusCard: View {
                         HStack(spacing: 16) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("已用")
-                                    .font(.system(size: 11, weight: .regular))
+                                    .font(.system(size: 12, weight: .regular))
                                     .foregroundColor(.white.opacity(0.6))
                                 Text(storageInfo.usedStorageText)
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(.white)
                             }
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("总计")
-                                    .font(.system(size: 11, weight: .regular))
+                                    .font(.system(size: 12, weight: .regular))
                                     .foregroundColor(.white.opacity(0.6))
                                 Text(storageInfo.totalStorageText)
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(.white)
                             }
                             
@@ -90,12 +90,12 @@ struct SystemStatusCard: View {
                             
                             VStack(alignment: .trailing, spacing: 2) {
                                 Text("磁盘剩余")
-                                    .font(.system(size: 10, weight: .regular))
+                                    .font(.system(size: 12, weight: .regular))
                                     .foregroundColor(.white.opacity(0.6))
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                                 Text(storageInfo.freeStorageText)
-                                    .font(.system(size: 11, weight: .semibold))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(.green)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
@@ -110,49 +110,41 @@ struct SystemStatusCard: View {
                 // 下载速度
                 if let downloaderInfo = status.downloaderInfo {
                     VStack(alignment: .leading, spacing: 12) {
-                        // 上传/下载速度
-                        HStack(spacing: 12) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack {
-                                    Image(systemName: "arrow.down.circle.fill")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.cyan)
-                                    Text("下载")
-                                        .font(.system(size: 13, weight: .regular))
-                                        .foregroundColor(.white.opacity(0.7))
-                                }
+                        // 上传/下载速度 - 左右居中布局
+                        HStack(spacing: 16) {
+                            // 下载 - 居中
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.down.circle.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.blue)
                                 Text(downloaderInfo.downloadSpeedText)
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.cyan)
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.blue)
                             }
+                            .frame(maxWidth: .infinity, alignment: .center)
                             
-                            Spacer()
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack {
-                                    Image(systemName: "arrow.up.circle.fill")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.orange)
-                                    Text("上传")
-                                        .font(.system(size: 13, weight: .regular))
-                                        .foregroundColor(.white.opacity(0.7))
-                                }
+                            // 上传 - 居中
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.up.circle.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.orange)
                                 Text(downloaderInfo.uploadSpeedText)
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(.system(size: 16, weight: .semibold))
                                     .foregroundColor(.orange)
                             }
+                            .frame(maxWidth: .infinity, alignment: .center)
                         }
                         
                         // 总传输和剩余空间
                         HStack(spacing: 0) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("总下载")
-                                    .font(.system(size: 10, weight: .regular))
+                                    .font(.system(size: 12, weight: .regular))
                                     .foregroundColor(.white.opacity(0.6))
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                                 Text(downloaderInfo.downloadSizeText)
-                                    .font(.system(size: 11, weight: .semibold))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(.cyan)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
@@ -161,12 +153,12 @@ struct SystemStatusCard: View {
                             
                             VStack(alignment: .center, spacing: 4) {
                                 Text("总上传")
-                                    .font(.system(size: 10, weight: .regular))
+                                    .font(.system(size: 12, weight: .regular))
                                     .foregroundColor(.white.opacity(0.6))
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                                 Text(downloaderInfo.uploadSizeText)
-                                    .font(.system(size: 11, weight: .semibold))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(.orange)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
@@ -175,12 +167,12 @@ struct SystemStatusCard: View {
                             
                             VStack(alignment: .trailing, spacing: 4) {
                                 Text("磁盘剩余")
-                                    .font(.system(size: 10, weight: .regular))
+                                    .font(.system(size: 12, weight: .regular))
                                     .foregroundColor(.white.opacity(0.6))
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                                 Text(downloaderInfo.freeSpaceText)
-                                    .font(.system(size: 11, weight: .semibold))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(.green)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
