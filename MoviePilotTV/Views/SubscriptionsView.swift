@@ -301,7 +301,7 @@ struct SubscriptionCardContent: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             
             // Title
-            Text(subscription.name)
+            Text(subscription.name ?? "未知")
                 .font(.system(size: 19, weight: .medium))
                 .foregroundColor(.white)
                 .lineLimit(2)
@@ -354,7 +354,7 @@ struct SubscriptionContextMenu: View {
                 }
             
             VStack(spacing: 15) {
-                Text(subscription.name)
+                Text(subscription.name ?? "未知")
                     .font(.headline)
                     .foregroundColor(.white)
                 

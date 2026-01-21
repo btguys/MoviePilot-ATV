@@ -9,9 +9,9 @@ import Foundation
 
 struct Subscription: Codable, Identifiable, Equatable {
     let id: Int?
-    let name: String
+    let name: String?
     let year: String?
-    let type: String // "电影" or "电视剧"
+    let type: String? // "电影" or "电视剧"
     let tmdbid: Int?
     let doubanid: String?
     let season: Int?
@@ -63,6 +63,7 @@ struct Subscription: Codable, Identifiable, Equatable {
     }
     
     var displayTitle: String {
+        guard let name = name else { return "未知" }
         var title = name
         if let year = year {
             title += " (\(year))"

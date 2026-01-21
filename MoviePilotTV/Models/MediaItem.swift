@@ -105,7 +105,7 @@ struct MediaItem: Codable, Identifiable, Equatable, Hashable {
             tmdbId: subscription.tmdbid,
             imdbId: nil,
             doubanId: subscription.doubanid,
-            title: subscription.name,
+            title: subscription.name ?? "未知",
             originalTitle: nil,
             overview: subscription.description,
             posterPath: subscription.poster,
