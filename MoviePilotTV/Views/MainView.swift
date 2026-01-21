@@ -314,15 +314,35 @@ struct SettingsView: View {
                         .foregroundColor(.white)
                     
                     VStack(spacing: 16) {
-                        Toggle("显示首页系统状态栏", isOn: Binding(
-                            get: { authManager.showHomeSystemStatus },
-                            set: { authManager.saveShowHomeSystemStatus($0) }
-                        ))
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                        .padding(24)
-                        .background(Color.white.opacity(0.05))
-                        .cornerRadius(12)
+                        HStack {
+                            Text("首页系统状态栏")
+                                .font(.system(size: 20))
+                                .foregroundColor(.white)
+                            Spacer()
+                            Menu {
+                                ForEach(HomeSystemStatusMode.allCases, id: \.self) { mode in
+                                    Button(action: { authManager.saveHomeSystemStatusMode(mode) }) {
+                                        HStack(spacing: 8) {
+                                            Text(mode.displayName)
+                                            if authManager.homeSystemStatusMode == mode {
+                                                Image(systemName: "checkmark")
+                                            }
+                                        }
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Text(authManager.homeSystemStatusMode.displayName)
+                                        .font(.system(size: 20))
+                                        .foregroundColor(.white)
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(.white)
+                                }
+                                .padding(12)
+                                .background(Color.white.opacity(0.05))
+                                .cornerRadius(12)
+                            }
+                        }
                     }
                 }
                 .padding(.horizontal, 80)

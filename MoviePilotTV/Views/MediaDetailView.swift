@@ -368,14 +368,14 @@ struct MediaDetailView: View {
 
                             VStack(alignment: .leading, spacing: 12) {
                                 Text(detail.title)
-                                    .font(.system(size: 34, weight: .bold))
+                                    .font(.system(size: 38, weight: .bold))
                                     .foregroundColor(.white)
                                     .lineLimit(2)
                                     .frame(maxWidth: 380, alignment: .leading)
 
                                 if let originalTitle = detail.originalTitle, originalTitle != detail.title {
                                     Text(originalTitle)
-                                        .font(.system(size: 20))
+                                        .font(.system(size: 24))
                                         .foregroundColor(.white.opacity(0.7))
                                         .lineLimit(1)
                                         .frame(maxWidth: 380, alignment: .leading)
@@ -394,9 +394,9 @@ struct MediaDetailView: View {
                                     Button(action: { viewModel.searchResources() }) {
                                         HStack(spacing: 2) {
                                             Image(systemName: "magnifyingglass")
-                                                .font(.system(size: 20))
+                                                .font(.system(size: 22))
                                             Text("搜索资源")
-                                                .font(.system(size: 20, weight: .semibold))
+                                                .font(.system(size: 22, weight: .semibold))
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
@@ -415,11 +415,11 @@ struct MediaDetailView: View {
                                                     ProgressView()
                                                 } else {
                                                     Image(systemName: viewModel.isSubscribed ? "heart.fill" : "heart")
-                                                        .font(.system(size: 20))
+                                                        .font(.system(size: 22))
                                                         .foregroundColor(viewModel.isSubscribed ? .red : .yellow)
                                                 }
                                                 Text(viewModel.isSubscribed ? "已订阅" : "订阅")
-                                                    .font(.system(size: 20, weight: .semibold))
+                                                    .font(.system(size: 22, weight: .semibold))
                                                     .foregroundColor(viewModel.isSubscribed ? .red : .yellow)
                                             }
                                             .padding(.horizontal, 16)
@@ -460,10 +460,10 @@ struct MediaDetailView: View {
                                                     .scaleEffect(0.9)
                                             } else {
                                                 Image(systemName: "play.circle.fill")
-                                                    .font(.system(size: 20))
+                                                    .font(.system(size: 22))
                                             }
                                             Text("Infuse播放")
-                                                .font(.system(size: 20, weight: .semibold))
+                                                .font(.system(size: 22, weight: .semibold))
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
@@ -492,22 +492,22 @@ struct MediaDetailView: View {
                                     if let rating = detail.voteAverage {
                                         HStack(spacing: 4) {
                                             Image(systemName: "star.fill")
-                                                .font(.system(size: 18))
+                                                .font(.system(size: 20))
                                                 .foregroundColor(.yellow)
                                             Text(String(format: "%.1f", rating))
-                                                .font(.system(size: 20, weight: .semibold))
+                                                .font(.system(size: 22, weight: .semibold))
                                         }
                                     }
 
                                     if let year = detail.year {
                                         Text(year)
-                                            .font(.system(size: 20))
+                                            .font(.system(size: 22))
                                             .foregroundColor(.white.opacity(0.8))
                                     }
 
                                     if let type = detail.type {
                                         Text(type)
-                                            .font(.system(size: 17))
+                                            .font(.system(size: 18))
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 4)
                                             .background(Color.blue.opacity(0.8))
@@ -516,7 +516,7 @@ struct MediaDetailView: View {
 
                                     if let lang = detail.originalLanguage {
                                         Text(lang.uppercased())
-                                            .font(.system(size: 17))
+                                            .font(.system(size: 18))
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 4)
                                             .background(Color.gray.opacity(0.6))
@@ -526,7 +526,7 @@ struct MediaDetailView: View {
                                     if let genres = detail.genres {
                                         ForEach(genres.prefix(4), id: \.self) { genre in
                                             Text(genre)
-                                                .font(.system(size: 15))
+                                                .font(.system(size: 18))
                                                 .padding(.horizontal, 8)
                                                 .padding(.vertical, 4)
                                                 .background(Color.purple.opacity(0.3))
@@ -540,7 +540,7 @@ struct MediaDetailView: View {
                                 if let overview = detail.overview {
                                     Button(action: { isOverviewExpanded.toggle() }) {
                                         Text(overview)
-                                            .font(.system(size: 24))
+                                            .font(.system(size: 26))
                                             .foregroundColor(.white.opacity(0.9))
                                             .lineSpacing(6)
                                             .multilineTextAlignment(.leading)

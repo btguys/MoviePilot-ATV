@@ -196,8 +196,93 @@ struct SystemStatusCard: View {
     }
 }
 
+// 简洁版系统状态卡片（仅两行）
+struct CompactSystemStatusCard: View {
+    @ObservedObject var viewModel: SystemStatusViewModel
+
+    var body: some View {
+        if let status = viewModel.systemStatus {
+            VStack(spacing: 12) {
+                // 第一行：存储图标 + 进度条 + 总存储
+                HStack(spacing: 12) {
+                    Image(systemName: "internaldrive.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.blue)
+                        .frame(width: 28)
+
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color.white.opacity(0.08))
+
+                            if let storage = status.storageInfo {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(LinearGradient(gradient: Gradient(colors: [.blue, .cyan]), startPoint: .leading, endPoint: .trailing))
+                                    .frame(width: max(0, geo.size.width * (storage.usagePercentage / 100)))
+                            }
+                        }
+                    }
+                    .frame(height: 8)
+
+                    if let storage = status.storageInfo {
+                        Text(storage.totalStorageText)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.9))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                }
+                .frame(height: 28)
+
+                // 第二行：下载 / 上传 速度 - 左右两块完整显示
+                HStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "arrow.down.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundColor(.blue)
+                        Text(status.downloaderInfo?.downloadSpeedText ?? "0.0 B/s")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 14, weight: .semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    HStack(spacing: 8) {
+                        Text(status.downloaderInfo?.uploadSpeedText ?? "0.0 B/s")
+                            .foregroundColor(.orange)
+                            .font(.system(size: 14, weight: .semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundColor(.orange)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+                .frame(height: 24)
+            }
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.black.opacity(0.85))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+            )
+        }
+    }
+}
+
 #Preview {
-    SystemStatusCard(viewModel: SystemStatusViewModel())
-        .padding()
-        .background(Color.black)
+    VStack(spacing: 16) {
+        SystemStatusCard(viewModel: SystemStatusViewModel())
+            .padding()
+            .background(Color.black)
+
+        CompactSystemStatusCard(viewModel: SystemStatusViewModel())
+            .padding()
+            .background(Color.black)
+    }
 }

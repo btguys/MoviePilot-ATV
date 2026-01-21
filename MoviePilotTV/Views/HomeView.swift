@@ -130,15 +130,28 @@ struct HomeView: View {
             }
             }
             
-            // 浮动系统状态卡片（右下角）- 根据设置显示
-            if authManager.showHomeSystemStatus {
+            // 浮动系统状态卡片（右下角）- 根据设置显示（完整 / 简洁 / 关闭）
+            switch authManager.homeSystemStatusMode {
+            case .off:
+                EmptyView()
+            case .full:
                 VStack {
                     Spacer()
                     SystemStatusCard(viewModel: systemStatusViewModel)
                         .frame(width: 300)
-                        .padding(.trailing, 10)
-                        .padding(.bottom, 10)
+                        .padding(.trailing, 0)
+                        .padding(.bottom, -20)
                 }
+                .zIndex(3)
+            case .compact:
+                VStack {
+                    CompactSystemStatusCard(viewModel: systemStatusViewModel)
+                        .frame(width: 260)
+                        .padding(.trailing, 0)
+                        .padding(.top, -120)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
                 .zIndex(3)
             }
         }
@@ -171,12 +184,12 @@ struct HomeView: View {
             systemStatusViewModel.stopUpdating()
             print("🛑 [HomeView] 已停止系统状态更新")
         }
-        .onChange(of: authManager.showHomeSystemStatus) { _, newValue in
-            if newValue {
-                print("✅ [HomeView] 设置已开启，启动系统状态更新")
+        .onChange(of: authManager.homeSystemStatusMode) { newValue in
+            if newValue != .off {
+                print("✅ [HomeView] 系统状态栏设置已启用 (\(newValue.rawValue))，启动系统状态更新")
                 systemStatusViewModel.startUpdating()
             } else {
-                print("⭕ [HomeView] 设置已关闭，停止系统状态更新")
+                print("⭕ [HomeView] 系统状态栏已关闭，停止系统状态更新")
                 systemStatusViewModel.stopUpdating()
             }
         }

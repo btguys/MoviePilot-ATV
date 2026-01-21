@@ -8,6 +8,21 @@
 import Foundation
 import Combine
 
+/// 首页系统状态显示模式：完整 / 简洁 / 关闭
+enum HomeSystemStatusMode: String, CaseIterable, Codable {
+    case full = "full"
+    case compact = "compact"
+    case off = "off"
+
+    var displayName: String {
+        switch self {
+        case .full: return "完整"
+        case .compact: return "简洁"
+        case .off: return "关闭"
+        }
+    }
+}
+
 @MainActor
 class AuthenticationManager: ObservableObject {
     static let shared = AuthenticationManager()
@@ -20,7 +35,7 @@ class AuthenticationManager: ObservableObject {
     @Published var savedPassword: String = ""
     @Published var showTokenExpiredAlert = false
     @Published var tokenExpiredMessage = ""
-    @Published var showHomeSystemStatus: Bool = true
+    @Published var homeSystemStatusMode: HomeSystemStatusMode = .full
     
     private let userDefaults = UserDefaults.standard
     private let endpointKey = "apiEndpoint"
@@ -28,7 +43,17 @@ class AuthenticationManager: ObservableObject {
     private let tmdbApiKeyKey = "tmdbApiKey"
     private let usernameKey = "savedUsername"
     private let passwordKey = "savedPassword"
-    private let showHomeSystemStatusKey = "showHomeSystemStatus"
+    private let homeSystemStatusModeKey = "homeSystemStatusMode"
+
+    /// 保存首页系统状态栏显示模式
+    func saveHomeSystemStatusMode(_ mode: HomeSystemStatusMode) {
+        homeSystemStatusMode = mode
+        userDefaults.set(mode.rawValue, forKey: homeSystemStatusModeKey)
+        print("✅ [AuthManager] 首页系统状态栏显示设置已保存: \(mode.rawValue)")
+    }
+
+    /// 便捷属性：是否应当显示系统状态栏（不是关闭时为 true）
+    var showHomeSystemStatus: Bool { homeSystemStatusMode != .off }
     
     private init() {
         loadCredentials()
@@ -45,11 +70,7 @@ class AuthenticationManager: ObservableObject {
         print("✅ [AuthManager] TMDB API KEY 已保存到 UserDefaults")
     }
     
-    func saveShowHomeSystemStatus(_ show: Bool) {
-        showHomeSystemStatus = show
-        userDefaults.set(show, forKey: showHomeSystemStatusKey)
-        print("✅ [AuthManager] 首页系统状态栏显示设置已保存: \(show)")
-    }
+
     
     func login(endpoint: String, username: String, password: String) async throws {
         // Save endpoint and credentials for auto re-login
@@ -181,9 +202,14 @@ class AuthenticationManager: ObservableObject {
             print("   ✅ 已保存的密码: ******")
         }
         
-        // 加载显示系统状态栏设置，默认为 true
-        showHomeSystemStatus = userDefaults.object(forKey: showHomeSystemStatusKey) as? Bool ?? true
-        print("   ✅ 显示首页系统状态栏: \(showHomeSystemStatus)")
+        // 加载首页系统状态栏显示模式，默认为完整（full）
+        if let modeRaw = userDefaults.string(forKey: homeSystemStatusModeKey),
+           let mode = HomeSystemStatusMode(rawValue: modeRaw) {
+            homeSystemStatusMode = mode
+        } else {
+            homeSystemStatusMode = .full
+        }
+        print("   ✅ 首页系统状态栏模式: \(homeSystemStatusMode.rawValue)")
     }
 }
 
