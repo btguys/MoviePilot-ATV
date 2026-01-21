@@ -153,6 +153,9 @@ struct SettingsView: View {
     @State private var tmdbApiKey: String = ""
     @State private var isEditingTmdbKey = false
     @FocusState private var isTmdbKeyFocused: Bool
+    // 聚焦管理：用于使下拉菜单向下键可跳转到退出登录
+    @FocusState private var isHomeStatusMenuFocused: Bool
+    @FocusState private var isLogoutButtonFocused: Bool
     
     var body: some View {
         ScrollView {
@@ -342,6 +345,13 @@ struct SettingsView: View {
                                 .background(Color.white.opacity(0.05))
                                 .cornerRadius(12)
                             }
+                            // 允许使用方向键从下移出 Menu 到下方的退出按钮
+                            .focused($isHomeStatusMenuFocused)
+                            .onMoveCommand { direction in
+                                if direction == .down {
+                                    isLogoutButtonFocused = true
+                                }
+                            }
                         }
                     }
                 }
@@ -362,6 +372,12 @@ struct SettingsView: View {
                     .frame(width: 300, height: 60)
                     .background(Color.red.opacity(0.8))
                     .cornerRadius(12)
+                }
+                .focused($isLogoutButtonFocused)
+                .onMoveCommand { direction in
+                    if direction == .up {
+                        isHomeStatusMenuFocused = true
+                    }
                 }
                 .padding(.top, 20)
                 .padding(.bottom, 60)

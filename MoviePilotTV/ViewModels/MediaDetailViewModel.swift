@@ -57,6 +57,73 @@ class MediaDetailViewModel: ObservableObject {
     private let sseService = SSEService()
     private var searchCompleteTimer: Timer?
     private let searchPageSize = 20
+
+    // MARK: - 搜索缓存（10 分钟）
+    private struct CachedSearchEntry: Codable {
+        let timestamp: Date
+        let torrents: [Torrent]
+    }
+
+    private static var searchCache: [String: CachedSearchEntry] = loadSearchCacheFromDefaults()
+    private static let searchCacheTTL: TimeInterval = 10 * 60 // 10 分钟
+    private static let searchCacheUserDefaultsKey = "MediaDetailSearchCache_v1"
+
+    private var lastSearchCacheKey: String? = nil
+
+    private static func getCachedSearchResults(forKey key: String) -> [Torrent]? {
+        if let entry = searchCache[key] {
+            let age = Date().timeIntervalSince(entry.timestamp)
+            if age < searchCacheTTL {
+                return entry.torrents
+            } else {
+                // 过期，移除
+                searchCache.removeValue(forKey: key)
+                saveSearchCacheToDefaults()
+                return nil
+            }
+        }
+        return nil
+    }
+
+    private static func setCachedSearchResults(_ torrents: [Torrent], forKey key: String) {
+        searchCache[key] = CachedSearchEntry(timestamp: Date(), torrents: torrents)
+        pruneExpiredCacheEntries()
+        saveSearchCacheToDefaults()
+    }
+
+    private static func pruneExpiredCacheEntries() {
+        let now = Date()
+        var removed = 0
+        for (k, entry) in searchCache {
+            if now.timeIntervalSince(entry.timestamp) >= searchCacheTTL {
+                searchCache.removeValue(forKey: k)
+                removed += 1
+            }
+        }
+        if removed > 0 {
+            print("🧹 [MediaDetailVM] 清理过期缓存条目: \(removed)")
+        }
+    }
+
+    private static func loadSearchCacheFromDefaults() -> [String: CachedSearchEntry] {
+        guard let data = UserDefaults.standard.data(forKey: searchCacheUserDefaultsKey) else { return [:] }
+        do {
+            let decoded = try JSONDecoder().decode([String: CachedSearchEntry].self, from: data)
+            return decoded
+        } catch {
+            print("⚠️ [MediaDetailVM] 读取搜索缓存失败: \(error)")
+            return [:]
+        }
+    }
+
+    private static func saveSearchCacheToDefaults() {
+        do {
+            let data = try JSONEncoder().encode(searchCache)
+            UserDefaults.standard.set(data, forKey: searchCacheUserDefaultsKey)
+        } catch {
+            print("⚠️ [MediaDetailVM] 保存搜索缓存失败: \(error)")
+        }
+    }
     
     // 从 MediaItem 加载详情
     func loadDetail(from media: MediaItem) {
@@ -228,7 +295,7 @@ class MediaDetailViewModel: ObservableObject {
     }
     
     // 搜索资源
-    func searchResources() {
+    func searchResources(forceRefresh: Bool = false) {
         guard let detail = mediaDetail else { return }
         
         // 确定来源和ID
@@ -250,6 +317,22 @@ class MediaDetailViewModel: ObservableObject {
         let mtype = detail.type ?? "电影"
         let sites = "1,2,5,6,8,9,10,11"
         
+        // 生成缓存键（基于来源/ID/类型/标题/年份/季/站点）
+        let cacheKey = [source, id, mtype, detail.title, detail.year ?? "", "", sites].joined(separator: "|")
+        // 先尝试使用缓存
+        if let cached = Self.getCachedSearchResults(forKey: cacheKey) {
+            print("📦 [MediaDetailVM] 使用缓存搜索结果（key=\(cacheKey)），共 \(cached.count) 项，年龄小于10分钟")
+            // 直接赋值并展示
+            searchResults = cached
+            resetVisibleResults()
+            searchProgress = 100
+            searchProgressText = "显示缓存结果"
+            showSearchProgress = false
+            return
+        }
+
+        // 没有缓存，继续执行真实搜索
+        lastSearchCacheKey = cacheKey
         Task {
             // 显示进度对话框
             await MainActor.run {
@@ -269,7 +352,8 @@ class MediaDetailViewModel: ObservableObject {
                 title: detail.title,
                 year: detail.year,
                 season: nil,
-                sites: sites
+                sites: sites,
+                cacheKey: cacheKey
             )
             
             // 断开 SSE
@@ -323,7 +407,7 @@ class MediaDetailViewModel: ObservableObject {
         }
     }
     
-    private func searchResourcesFromAPI(source: String, id: String, mtype: String, title: String, year: String?, season: String?, sites: String) async {
+    private func searchResourcesFromAPI(source: String, id: String, mtype: String, title: String, year: String?, season: String?, sites: String, cacheKey: String?) async {
         isSearching = true
         defer { isSearching = false }
         
@@ -345,6 +429,12 @@ class MediaDetailViewModel: ObservableObject {
                 resetVisibleResults()
                 print("✅ [MediaDetailVM] 找到 \(searchResults.count) 个资源")
                 print("🔵 [MediaDetailVM] searchResults 已更新，count = \(searchResults.count)")
+                
+                // 将结果写入缓存（如果提供了缓存键）
+                if let key = cacheKey {
+                    print("📦 [MediaDetailVM] 将搜索结果写入缓存（key=\(key)，共 \(searchResults.count) 项）")
+                    Self.setCachedSearchResults(searchResults, forKey: key)
+                }
                 
                 // 如果搜索已完成（进度100%）且有结果，启动延迟关闭
                 if searchProgress >= 100 && !searchResults.isEmpty && showSearchProgress {
@@ -631,8 +721,23 @@ class MediaDetailViewModel: ObservableObject {
         defer { isDownloading = false }
         
         let request = buildDownloadRequest(torrent: torrent, detail: detail)
+        // 日志: 打印提交信息和请求 payload（若可序列化）
+        print("🔵 [MediaDetailVM] 提交下载请求 - 标题: \(torrent.title ?? "未知标题") 站点: \(torrent.siteName ?? "未知站点") 大小: \(torrent.size.map({ String($0) }) ?? "未知")")
         do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted]
+            if let reqData = try? encoder.encode(request), let reqString = String(data: reqData, encoding: .utf8) {
+                print("🔵 [MediaDetailVM] 下载请求 payload:\n\(reqString)")
+            }
+
+            // 明确提示将要调用的端点（便于快速定位）
+            print("🔵 [MediaDetailVM] 调用 API: POST /api/v1/download/")
+
             let response = try await apiService.downloadTorrent(request: request)
+
+            // 记录返回的响应摘要
+            print("📗 [MediaDetailVM] 下载接口返回: success=\(response.success), message=\(response.message ?? "nil"), download_id=\(response.data?.download_id ?? "nil")")
+
             if response.success {
                 var message = response.message ?? "已添加到下载队列"
                 if let downloadId = response.data?.download_id, !downloadId.isEmpty {
@@ -645,7 +750,7 @@ class MediaDetailViewModel: ObservableObject {
                 showError = true
             }
         } catch {
-            print("❌ [MediaDetailVM] 下载失败: \(error)")
+            print("❌ [MediaDetailVM] 下载失败: \(error) \n描述: \(error.localizedDescription)")
             errorMessage = "下载失败: \(error.localizedDescription)"
             showError = true
         }

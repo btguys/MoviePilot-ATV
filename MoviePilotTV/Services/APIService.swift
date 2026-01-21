@@ -378,24 +378,8 @@ class APIService {
     }
     
     func deleteSubscription(id: Int) async throws {
-        print("🔵 [APIService] 取消订阅请求 - ID: \(id)")
         let request = try createRequest(endpoint: "/api/v1/subscribe/\(id)", method: "DELETE")
-
-        // 取消订阅API应该返回包装格式 {"success":true,"message":null,"data":{}}
-        let response: MoviePilotResponse<EmptyResponse> = try await performRequest(request)
-
-        print("✅ [APIService] 取消订阅响应解析成功:")
-        print("   success: \(response.success)")
-        print("   message: \(response.message ?? "null")")
-        print("   data: \(String(describing: response.data))")
-
-        // 检查响应是否表示成功
-        guard response.success else {
-            print("❌ [APIService] 服务器返回取消订阅失败: \(response.message ?? "null")")
-            throw APIError.serverError(400) // 使用400表示业务逻辑错误
-        }
-
-        print("✅ [APIService] 取消订阅成功确认")
+        let _: EmptyResponse = try await performRequest(request)
     }
     
     // 检查订阅状态
@@ -582,13 +566,36 @@ class APIService {
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("Bearer \(authManager.accessToken)", forHTTPHeaderField: "Authorization")
         urlRequest.httpBody = try JSONEncoder().encode(request)
-        
-        let (data, response) = try await urlSession.data(for: urlRequest)
-        guard let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode) else {
-            throw URLError(.badServerResponse)
+
+        // 日志: 打印请求的 endpoint 与 body（可读 JSON）
+        if let body = urlRequest.httpBody, let bodyString = String(data: body, encoding: .utf8) {
+            print("🔵 [APIService] POST \(url.absoluteString) - 请求体:\n\(bodyString)")
+        } else {
+            print("🔵 [APIService] POST \(url.absoluteString) - 请求体为空或不可序列化")
         }
-        let result = try JSONDecoder().decode(DownloadResponse.self, from: data)
-        return result
+
+        let (data, response) = try await urlSession.data(for: urlRequest)
+
+        // 打印原始响应文本，便于排查 JSON 解析或服务器错误
+        let responseText = String(data: data, encoding: .utf8) ?? "<binary-response>"
+        if let httpResponse = response as? HTTPURLResponse {
+            print("📗 [APIService] 响应来自 \(url.absoluteString) - status: \(httpResponse.statusCode)\n\(responseText)")
+            guard (200..<300).contains(httpResponse.statusCode) else {
+                print("❌ [APIService] 非2xx响应: \(httpResponse.statusCode) \n 响应体: \(responseText)")
+                throw URLError(.badServerResponse)
+            }
+        } else {
+            print("⚠️ [APIService] 未收到 HTTP 响应对象 - 原始响应: \(response)")
+        }
+
+        do {
+            let result = try JSONDecoder().decode(DownloadResponse.self, from: data)
+            print("✅ [APIService] downloadTorrent 解析成功: success=\(result.success), message=\(result.message ?? "nil"), download_id=\(result.data?.download_id ?? "nil")")
+            return result
+        } catch {
+            print("❌ [APIService] 解析 downloadTorrent 响应失败: \(error). 原始响应: \(responseText)")
+            throw error
+        }
     }
 }
 
@@ -597,7 +604,7 @@ class APIService {
 // MoviePilot 标准响应包装
 struct MoviePilotResponse<T: Codable>: Codable {
     let success: Bool
-    let message: String?
+    let message: String
     let data: T?
 }
 
