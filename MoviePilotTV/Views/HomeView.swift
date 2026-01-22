@@ -91,6 +91,9 @@ struct HomeView: View {
             }
             .background(Color.black)
             .zIndex(2)
+            .navigationDestination(for: CategoryMoreDestination.self) { destination in
+                CategoryMoreView(source: destination.source, categoryTitle: destination.title)
+            }
             .onChange(of: isHeroFocused) { isFocused in
                 if isFocused {
                     // 当Hero被聚焦时，滚动使其贴近屏幕上边界
@@ -130,29 +133,31 @@ struct HomeView: View {
             }
             }
             
-            // 浮动系统状态卡片（右下角）- 根据设置显示（完整 / 简洁 / 关闭）
-            switch authManager.homeSystemStatusMode {
-            case .off:
-                EmptyView()
-            case .full:
-                VStack {
-                    Spacer()
-                    SystemStatusCard(viewModel: systemStatusViewModel)
-                        .frame(width: 300)
-                        .padding(.trailing, 0)
-                        .padding(.bottom, -20)
+            // 浮动系统状态卡片（右下角）- 根据设置显示
+            if authManager.showHomeSystemStatus {
+                switch authManager.homeSystemStatusMode {
+                case .full:
+                    VStack {
+                        Spacer()
+                        SystemStatusCard(viewModel: systemStatusViewModel)
+                            .frame(width: 300)
+                            .padding(.trailing, 0)
+                            .padding(.bottom, -20)
+                    }
+                    .zIndex(3)
+                case .compact:
+                    VStack {
+                        CompactSystemStatusCard(viewModel: systemStatusViewModel)
+                            .frame(width: 260)
+                            .padding(.trailing, 0)
+                            .padding(.top, -120)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .zIndex(3)
+                case .off:
+                    EmptyView()
                 }
-                .zIndex(3)
-            case .compact:
-                VStack {
-                    CompactSystemStatusCard(viewModel: systemStatusViewModel)
-                        .frame(width: 260)
-                        .padding(.trailing, 0)
-                        .padding(.top, -120)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-                .zIndex(3)
             }
         }
         .onAppear {
@@ -184,12 +189,12 @@ struct HomeView: View {
             systemStatusViewModel.stopUpdating()
             print("🛑 [HomeView] 已停止系统状态更新")
         }
-        .onChange(of: authManager.homeSystemStatusMode) { newValue in
-            if newValue != .off {
-                print("✅ [HomeView] 系统状态栏设置已启用 (\(newValue.rawValue))，启动系统状态更新")
+        .onChange(of: authManager.showHomeSystemStatus) { _, newValue in
+            if newValue {
+                print("✅ [HomeView] 设置已开启，启动系统状态更新")
                 systemStatusViewModel.startUpdating()
             } else {
-                print("⭕ [HomeView] 系统状态栏已关闭，停止系统状态更新")
+                print("⭕ [HomeView] 设置已关闭，停止系统状态更新")
                 systemStatusViewModel.stopUpdating()
             }
         }
@@ -298,6 +303,21 @@ struct MediaSection: View {
     @Binding var lastFocusedCardId: Int?
     var isFirstSection: Bool = false
     
+    // 从 title 推断 source
+    private var sourceKey: String {
+        switch title {
+        case "TMDB 流行趋势": return "tmdb_trending"
+        case "豆瓣热门电影": return "douban_movie_hot"
+        case "豆瓣热门剧集": return "douban_tv_hot"
+        default: return "tmdb_trending"
+        }
+    }
+    
+    // 判断是否显示更多卡片（只有这三个栏目显示）
+    private var showMoreCard: Bool {
+        return title == "TMDB 流行趋势" || title == "豆瓣热门电影" || title == "豆瓣热门剧集"
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text(title)
@@ -323,6 +343,15 @@ struct MediaSection: View {
                             }
                             .buttonStyle(.card)
                             .focused(focusedCardId, equals: item.id)
+                        }
+                        
+                        // 更多卡片（仅指定栏目显示）
+                        if showMoreCard {
+                            NavigationLink(value: CategoryMoreDestination(source: sourceKey, title: title)) {
+                                HomeMoreCard()
+                                    .frame(width: 220)
+                            }
+                            .buttonStyle(.card)
                         }
                     }
                     .padding(.vertical, 20)
@@ -440,6 +469,55 @@ struct SubscriptionSection: View {
                 .padding(.horizontal, 20)
             }
             .focusSection()
+        }
+    }
+}
+
+// MARK: - Home More Card Component
+
+private struct HomeMoreCard: View {
+    var body: some View {
+        VStack(alignment: .center, spacing: 10) {
+            // 主卡片区域 - 保持与 MediaCard 相同的宽高比
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.blue.opacity(0.4),
+                                Color.purple.opacity(0.4)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .aspectRatio(2/3, contentMode: .fill)
+                
+                VStack(spacing: 16) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.white)
+                    
+                    Text("查看更多")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundColor(.white)
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 20))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            
+            // 占位文字 - 保持与 MediaCard 相同的间距
+            Text("")
+                .font(.system(size: 19, weight: .medium))
+                .foregroundColor(.clear)
+                .lineLimit(2)
+            
+            Text("")
+                .font(.system(size: 15))
+                .foregroundColor(.clear)
         }
     }
 }

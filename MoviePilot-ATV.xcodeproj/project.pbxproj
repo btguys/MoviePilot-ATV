@@ -43,6 +43,8 @@
 		7864CA6E2F18D0BC00B507F8 /* TVServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7864CA6D2F18D0BC00B507F8 /* TVServices.framework */; };
 		7864CA752F18D0BC00B507F8 /* MoviePilotTVTopShelf.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7864CA6B2F18D0BC00B507F8 /* MoviePilotTVTopShelf.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7864CA822F18D83600B507F8 /* TopShelfHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7864CA802F18D83600B507F8 /* TopShelfHelper.swift */; };
+		7864CAB32F21DF2900B507F8 /* CategoryMoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7864CAB22F21DF2900B507F8 /* CategoryMoreView.swift */; };
+		7864CAB52F21DF3C00B507F8 /* CategoryMoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7864CAB42F21DF3C00B507F8 /* CategoryMoreViewModel.swift */; };
 		B1CB0004D7BB78A24D3C8DB9 /* WebSocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBFD805634BCB59C67C7169 /* WebSocketService.swift */; };
 /* End PBXBuildFile section */
 
@@ -109,6 +111,8 @@
 		7864CA6D2F18D0BC00B507F8 /* TVServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TVServices.framework; path = System/Library/Frameworks/TVServices.framework; sourceTree = SDKROOT; };
 		7864CA802F18D83600B507F8 /* TopShelfHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopShelfHelper.swift; sourceTree = "<group>"; };
 		7864CA842F18D9AA00B507F8 /* MoviePilotTV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MoviePilotTV.entitlements; sourceTree = "<group>"; };
+		7864CAB22F21DF2900B507F8 /* CategoryMoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryMoreView.swift; sourceTree = "<group>"; };
+		7864CAB42F21DF3C00B507F8 /* CategoryMoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryMoreViewModel.swift; sourceTree = "<group>"; };
 		A6269B6741F747DF8307FD41 /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
 		BEBFD805634BCB59C67C7169 /* WebSocketService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WebSocketService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -194,6 +198,7 @@
 		4A0103 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7864CAB22F21DF2900B507F8 /* CategoryMoreView.swift */,
 				780172E32F0779AE00C7EAF0 /* SystemStatusCard.swift */,
 				4A0006 /* LoginView.swift */,
 				4A0008 /* MainView.swift */,
@@ -212,6 +217,7 @@
 		4A0104 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				7864CAB42F21DF3C00B507F8 /* CategoryMoreViewModel.swift */,
 				780172E12F07799E00C7EAF0 /* SystemStatusViewModel.swift */,
 				4A0022 /* HomeViewModel.swift */,
 				4A0024 /* SearchViewModel.swift */,
@@ -372,6 +378,8 @@
 				780172E42F0779AE00C7EAF0 /* SystemStatusCard.swift in Sources */,
 				4A0001 /* MoviePilotTVApp.swift in Sources */,
 				4A0005 /* LoginView.swift in Sources */,
+				7864CAB52F21DF3C00B507F8 /* CategoryMoreViewModel.swift in Sources */,
+				7864CAB32F21DF2900B507F8 /* CategoryMoreView.swift in Sources */,
 				4A0007 /* MainView.swift in Sources */,
 				4A0009 /* HomeView.swift in Sources */,
 				4A000B /* SearchView.swift in Sources */,

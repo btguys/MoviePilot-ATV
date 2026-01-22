@@ -72,6 +72,12 @@ struct RecommendView: View {
             }
         }
         .background(Color.black)
+        .navigationDestination(for: MediaItem.self) { media in
+            MediaDetailView(media: media)
+        }
+        .navigationDestination(for: CategoryMoreDestination.self) { destination in
+            CategoryMoreView(source: destination.source, categoryTitle: destination.title)
+        }
         .onAppear {
             if viewModel.sections.isEmpty {
                 viewModel.loadAllRecommendations()
@@ -88,6 +94,26 @@ struct RecommendView: View {
 struct RecommendSectionView: View {
     let section: RecommendSection
     
+    // 从 section title 推断 source
+    private var sourceKey: String {
+        switch section.title {
+        case "TMDB 流行趋势": return "tmdb_trending"
+        case "TMDB 电影": return "tmdb_movies"
+        case "TMDB 剧集": return "tmdb_tvs"
+        case "豆瓣热门电影": return "douban_movie_hot"
+        case "豆瓣热门剧集": return "douban_tv_hot"
+        case "豆瓣电影 TOP250": return "douban_movie_top250"
+        case "豆瓣最新电影": return "douban_movies"
+        case "豆瓣最新剧集": return "douban_tvs"
+        default: return "tmdb_trending"
+        }
+    }
+    
+    // 限制显示前10条
+    private var displayItems: [MediaItem] {
+        return Array(section.items.prefix(10))
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text(section.title)
@@ -98,20 +124,83 @@ struct RecommendSectionView: View {
             // 使用 LazyHStack 而不是 ScrollView 来改善焦点行为
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 18) {
-                    ForEach(section.items) { item in
-                        NavigationLink(destination: MediaDetailView(media: item)) {
+                    ForEach(displayItems) { item in
+                        NavigationLink(value: item) {
                             MediaCard(media: item)
                                 .frame(width: 220)
                         }
                         .buttonStyle(.card)
                     }
+                    
+                    // 更多卡片
+                    NavigationLink(value: CategoryMoreDestination(source: sourceKey, title: section.title)) {
+                        MoreCard()
+                            .frame(width: 220)
+                    }
+                    .buttonStyle(.card)
                 }
-                        .padding(.vertical, 20) // 放大时留出更多上下空间，避免裁切
+                .padding(.vertical, 20) // 放大时留出更多上下空间，避免裁切
                 .padding(.horizontal, 30)
             }
             .focusSection()
         }
     }
+}
+
+// MARK: - More Card Component
+
+private struct MoreCard: View {
+    var body: some View {
+        VStack(alignment: .center, spacing: 10) {
+            // 主卡片区域 - 保持与 MediaCard 相同的宽高比
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.blue.opacity(0.4),
+                                Color.purple.opacity(0.4)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .aspectRatio(2/3, contentMode: .fill)
+                
+                VStack(spacing: 16) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.white)
+                    
+                    Text("查看更多")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundColor(.white)
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 20))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            
+            // 占位文字 - 保持与 MediaCard 相同的间距
+            Text("")
+                .font(.system(size: 19, weight: .medium))
+                .foregroundColor(.clear)
+                .lineLimit(2)
+            
+            Text("")
+                .font(.system(size: 15))
+                .foregroundColor(.clear)
+        }
+    }
+}
+
+// MARK: - Navigation Destination Type
+
+struct CategoryMoreDestination: Hashable {
+    let source: String
+    let title: String
 }
 
 struct RecommendView_Previews: PreviewProvider {
