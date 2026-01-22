@@ -201,7 +201,22 @@ class APIService {
         let request = try createRequest(endpoint: "/api/v1/recommend/\(source)")
         return try await performRequest(request)
     }
-    
+    // 获取索引器站点配置 (IndexerSites)
+    // 响应示例: {"success":true,"message":null,"data":{"value":[1,2,5,6,8,9,10,11]}}
+    private struct IndexerSitesData: Codable {
+        let value: [Int]?
+    }
+
+    func getIndexerSites() async throws -> [Int] {
+        let request = try createRequest(endpoint: "/api/v1/system/setting/IndexerSites")
+        let resp: MoviePilotResponse<IndexerSitesData> = try await performRequest(request)
+        if let arr = resp.data?.value {
+            print("✅ [APIService] IndexerSites: \(arr)")
+            return arr
+        }
+        print("⚠️ [APIService] IndexerSites 返回空或无 data.value，返回空数组")
+        return []
+    }    
     func searchMedia(keyword: String, page: Int = 1) async throws -> [MediaItem] {
         let encodedKeyword = keyword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let request = try createRequest(endpoint: "/api/v1/media/search?title=\(encodedKeyword)&page=\(page)")
@@ -604,7 +619,7 @@ class APIService {
 // MoviePilot 标准响应包装
 struct MoviePilotResponse<T: Codable>: Codable {
     let success: Bool
-    let message: String
+    let message: String?
     let data: T?
 }
 

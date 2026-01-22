@@ -70,6 +70,81 @@ class MediaDetailViewModel: ObservableObject {
 
     private var lastSearchCacheKey: String? = nil
 
+    // MARK: - IndexerSites 缓存（15 分钟）
+    private struct IndexerSitesCacheEntry: Codable {
+        let timestamp: Date
+        let sites: [Int]
+    }
+
+    private static var indexerSitesCache: IndexerSitesCacheEntry? = loadIndexerSitesCacheFromDefaults()
+    private static let indexerSitesCacheTTL: TimeInterval = 15 * 60 // 15 分钟
+    private static let indexerSitesCacheUserDefaultsKey = "IndexerSitesCache_v1"
+
+    private static func getCachedIndexerSites() -> [Int]? {
+        guard let entry = indexerSitesCache else { return nil }
+        if Date().timeIntervalSince(entry.timestamp) < indexerSitesCacheTTL {
+            return entry.sites
+        }
+        indexerSitesCache = nil
+        saveIndexerSitesCacheToDefaults()
+        print("🧹 [MediaDetailVM] IndexerSites 缓存已过期并已清除")
+        return nil
+    }
+
+    private static func setCachedIndexerSites(_ sites: [Int]) {
+        indexerSitesCache = IndexerSitesCacheEntry(timestamp: Date(), sites: sites)
+        saveIndexerSitesCacheToDefaults()
+    }
+
+    private static func loadIndexerSitesCacheFromDefaults() -> IndexerSitesCacheEntry? {
+        guard let data = UserDefaults.standard.data(forKey: indexerSitesCacheUserDefaultsKey) else { return nil }
+        do {
+            let decoded = try JSONDecoder().decode(IndexerSitesCacheEntry.self, from: data)
+            return decoded
+        } catch {
+            print("⚠️ [MediaDetailVM] 读取 IndexerSites 缓存失败: \(error)")
+            return nil
+        }
+    }
+
+    private static func saveIndexerSitesCacheToDefaults() {
+        do {
+            if let entry = indexerSitesCache {
+                let data = try JSONEncoder().encode(entry)
+                UserDefaults.standard.set(data, forKey: indexerSitesCacheUserDefaultsKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: indexerSitesCacheUserDefaultsKey)
+            }
+        } catch {
+            print("⚠️ [MediaDetailVM] 保存 IndexerSites 缓存失败: \(error)")
+        }
+    }
+
+    // 从服务端或缓存获取 sites 字符串（例如 "1,2,5,6"），优先缓存，超时后回退到默认固定值
+    private func getDefaultSearchSites() async -> String {
+        // 1) 尝试缓存
+        if let cached = Self.getCachedIndexerSites(), !cached.isEmpty {
+            print("📦 [MediaDetailVM] 使用缓存 IndexerSites: \(cached)")
+            return cached.map(String.init).joined(separator: ",")
+        }
+
+        // 2) 从 API 拉取
+        do {
+            let sites = try await apiService.getIndexerSites()
+            if !sites.isEmpty {
+                Self.setCachedIndexerSites(sites)
+                print("✅ [MediaDetailVM] 从 API 获取 IndexerSites 并缓存: \(sites)")
+                return sites.map(String.init).joined(separator: ",")
+            }
+        } catch {
+            print("⚠️ [MediaDetailVM] 拉取 IndexerSites 失败: \(error)")
+        }
+
+        // 3) 回退到兼容旧行为的默认值
+        print("⚠️ [MediaDetailVM] 使用默认站点列表回退")
+        return "1,2,5,6,8,9,10,11"
+    }
+
     private static func getCachedSearchResults(forKey key: String) -> [Torrent]? {
         if let entry = searchCache[key] {
             let age = Date().timeIntervalSince(entry.timestamp)
@@ -315,35 +390,41 @@ class MediaDetailViewModel: ObservableObject {
         }
         
         let mtype = detail.type ?? "电影"
-        let sites = "1,2,5,6,8,9,10,11"
-        
-        // 生成缓存键（基于来源/ID/类型/标题/年份/季/站点）
-        let cacheKey = [source, id, mtype, detail.title, detail.year ?? "", "", sites].joined(separator: "|")
-        // 先尝试使用缓存
-        if let cached = Self.getCachedSearchResults(forKey: cacheKey) {
-            print("📦 [MediaDetailVM] 使用缓存搜索结果（key=\(cacheKey)），共 \(cached.count) 项，年龄小于10分钟")
-            // 直接赋值并展示
-            searchResults = cached
-            resetVisibleResults()
-            searchProgress = 100
-            searchProgressText = "显示缓存结果"
-            showSearchProgress = false
-            return
-        }
 
-        // 没有缓存，继续执行真实搜索
-        lastSearchCacheKey = cacheKey
+        // 使用异步 Task 获取站点配置并继续（支持强制刷新以绕过缓存）
         Task {
+            let sites = await getDefaultSearchSites()
+
+            // 生成缓存键（基于来源/ID/类型/标题/年份/季/站点）
+            let cacheKey = [source, id, mtype, detail.title, detail.year ?? "", "", sites].joined(separator: "|")
+
+            // 先尝试使用缓存，除非强制刷新
+            if !forceRefresh, let cached = Self.getCachedSearchResults(forKey: cacheKey) {
+                print("📦 [MediaDetailVM] 使用缓存搜索结果（key=\(cacheKey)），共 \(cached.count) 项，年龄小于10分钟")
+                // 直接赋值并展示
+                await MainActor.run {
+                    searchResults = cached
+                    resetVisibleResults()
+                    searchProgress = 100
+                    searchProgressText = "显示缓存结果"
+                    showSearchProgress = false
+                }
+                return
+            }
+
+            // 没有缓存或被强制刷新，继续执行真实搜索
+            lastSearchCacheKey = cacheKey
+
             // 显示进度对话框
             await MainActor.run {
                 showSearchProgress = true
                 searchProgress = 0
                 searchProgressText = "正在准备搜索..."
             }
-            
+
             // 连接 SSE 获取进度
             await connectToSearchProgress()
-            
+
             // 执行搜索
             await searchResourcesFromAPI(
                 source: source,
@@ -355,10 +436,10 @@ class MediaDetailViewModel: ObservableObject {
                 sites: sites,
                 cacheKey: cacheKey
             )
-            
+
             // 断开 SSE
             sseService.disconnect()
-            
+
             print("🔵 [MediaDetailVM] 搜索完成，即将关闭进度对话框")
             print("🔵 [MediaDetailVM] 当前 searchResults.count = \(searchResults.count)")
 
