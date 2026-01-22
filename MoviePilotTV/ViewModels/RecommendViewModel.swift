@@ -31,8 +31,8 @@ class RecommendViewModel: ObservableObject {
                 ("douban_movie_hot", "豆瓣热门电影"),
                 ("douban_tv_hot", "豆瓣热门剧集"),
                 ("douban_movie_top250", "豆瓣电影 TOP250"),
-                ("douban_movies", "豆瓣电影"),
-                ("douban_tvs", "豆瓣剧集")
+                ("douban_movies", "豆瓣最新电影"),
+                ("douban_tvs", "豆瓣最新剧集")
             ]
             
             print("📊 [RecommendViewModel] 准备加载 \(categories.count) 个分类")

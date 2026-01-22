@@ -264,13 +264,16 @@ struct CompactSystemStatusCard: View {
             }
             .padding(12)
             .background(
+                // 使用半透明的 material 背景并添加阴影，模拟 tab 导航栏的浮层感
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.black.opacity(0.85))
+                    .fill(.ultraThinMaterial)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.white.opacity(0.08), lineWidth: 1)
                     )
+                    .shadow(color: Color.black.opacity(0.55), radius: 10, x: 0, y: 6)
             )
+            .accessibilityElement(children: .contain) // 保持无障碍行为一致
         }
     }
 }
