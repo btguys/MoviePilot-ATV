@@ -74,88 +74,96 @@ class HomeViewModel: ObservableObject {
     
     private func loadRecommendations() async {
         isLoadingTrending = true
-        
+
         print("🔵 [HomeViewModel] 开始刷新推荐内容...")
         let startTime = Date()
-        
-        do {
-            // 并发加载多个推荐源
-            print("📡 [HomeViewModel] 请求 tmdb_trending...")
-            let tmdbStartTime = Date()
-            async let tmdbTrendingTask = apiService.getRecommendations(source: "tmdb_trending")
-            
-            print("📡 [HomeViewModel] 请求 douban_movie_hot...")
-            let doubanMovieStartTime = Date()
-            async let doubanMoviesTask = apiService.getRecommendations(source: "douban_movie_hot")
-            
-            print("📡 [HomeViewModel] 请求 douban_tv_hot...")
-            let doubanTVStartTime = Date()
-            async let doubanTVsTask = apiService.getRecommendations(source: "douban_tv_hot")
-            
-            let (tmdb, doubanMovies, doubanTVs) = try await (tmdbTrendingTask, doubanMoviesTask, doubanTVsTask)
-            
-            let tmdbDuration = Date().timeIntervalSince(tmdbStartTime) * 1000
-            let doubanMovieDuration = Date().timeIntervalSince(doubanMovieStartTime) * 1000
-            let doubanTVDuration = Date().timeIntervalSince(doubanTVStartTime) * 1000
-            let totalDuration = Date().timeIntervalSince(startTime) * 1000
-            
-            print("✅ [HomeViewModel] 成功获取: TMDB=\(tmdb.count), 豆瓣电影=\(doubanMovies.count), 豆瓣剧集=\(doubanTVs.count)")
-            print("⏱️  [HomeViewModel] 响应速度:")
-            print("   TMDB: \(String(format: "%.0f", tmdbDuration))ms")
-            print("   豆瓣电影: \(String(format: "%.0f", doubanMovieDuration))ms")
-            print("   豆瓣剧集: \(String(format: "%.0f", doubanTVDuration))ms")
-            print("   总耗时: \(String(format: "%.0f", totalDuration))ms")
-            
-            // 更新数据
-            let tmdbArray = Array(tmdb.prefix(10))
-            let moviesArray = Array(doubanMovies.prefix(10))
-            let tvsArray = Array(doubanTVs.prefix(10))
-            
-            tmdbTrending = tmdbArray
-            doubanHotMovies = moviesArray
-            doubanHotTVs = tvsArray
 
-            // 记录豆瓣海报可用性，排查图片无法显示问题
-            let movieMissingPoster = moviesArray.filter { ($0.posterPath ?? "").isEmpty }.count
-            let tvMissingPoster = tvsArray.filter { ($0.posterPath ?? "").isEmpty }.count
-            print("🟣 [HomeViewModel] 豆瓣热门电影: 总数=\(moviesArray.count), 海报缺失=\(movieMissingPoster)")
-            print("🟣 [HomeViewModel] 豆瓣热门剧集: 总数=\(tvsArray.count), 海报缺失=\(tvMissingPoster)")
-            let moviePosterSamples = moviesArray.prefix(3).map { $0.posterPath ?? "<nil>" }.joined(separator: " | ")
-            let tvPosterSamples = tvsArray.prefix(3).map { $0.posterPath ?? "<nil>" }.joined(separator: " | ")
-            print("🔎 [HomeViewModel] 豆瓣电影 posterPath 样本: \(moviePosterSamples)")
-            print("🔎 [HomeViewModel] 豆瓣剧集 posterPath 样本: \(tvPosterSamples)")
-            
-            // 设置精选内容
-            if !tmdb.isEmpty {
-                featuredMedia = Array(tmdb.prefix(1))
+        // 使用 TaskGroup 独立加载每个推荐源，防止单个失败影响其他
+        await withTaskGroup(of: Void.self) { group in
+            // TMDB 流行趋势
+            group.addTask {
+                do {
+                    print("📡 [HomeViewModel] 请求 tmdb_trending...")
+                    let tmdbStartTime = Date()
+                    let tmdb = try await self.apiService.getRecommendations(source: "tmdb_trending")
+                    let duration = Date().timeIntervalSince(tmdbStartTime) * 1000
+
+                    let tmdbArray = Array(tmdb.prefix(10))
+                    print("✅ [HomeViewModel] TMDB 流行趋势: \(tmdbArray.count) 项 (\(String(format: "%.0f", duration))ms)")
+
+                    await MainActor.run {
+                        self.tmdbTrending = tmdbArray
+                        self.cacheManager.saveTmdbTrending(tmdbArray)
+
+                        // 精选内容使用 TMDB 第一个
+                        if !tmdbArray.isEmpty {
+                            self.featuredMedia = Array(tmdbArray.prefix(1))
+                            self.cacheManager.saveFeaturedMedia(self.featuredMedia)
+                        }
+
+                        // 更新 Top Shelf
+                        TopShelfHelper.shared.updateTopShelfRecommendations(tmdbArray)
+                    }
+                } catch {
+                    print("❌ [HomeViewModel] TMDB 流行趋势 失败: \(error)")
+                }
             }
-            
-            // 保存到缓存
-            cacheManager.saveTmdbTrending(tmdbArray)
-            cacheManager.saveDoubanHotMovies(moviesArray)
-            cacheManager.saveDoubanHotTVs(tvsArray)
-            cacheManager.saveFeaturedMedia(featuredMedia)
-            
-            // 更新 Top Shelf 内容
-            print("🔝 [HomeViewModel] 准备更新 Top Shelf，TMDB 项目数: \(tmdbArray.count)")
-            if tmdbArray.isEmpty {
-                print("⚠️ [HomeViewModel] TMDB 数组为空，Top Shelf 将无内容!")
-            } else {
-                print("   前3项: \(tmdbArray.prefix(3).map { $0.title })")
+
+            // 豆瓣热门电影
+            group.addTask {
+                do {
+                    print("📡 [HomeViewModel] 请求 douban_movie_hot...")
+                    let doubanMovieStartTime = Date()
+                    let movies = try await self.apiService.getRecommendations(source: "douban_movie_hot")
+                    let duration = Date().timeIntervalSince(doubanMovieStartTime) * 1000
+
+                    let moviesArray = Array(movies.prefix(10))
+                    print("✅ [HomeViewModel] 豆瓣热门电影: \(moviesArray.count) 项 (\(String(format: "%.0f", duration))ms)")
+
+                    let movieMissingPoster = moviesArray.filter { ($0.posterPath ?? "").isEmpty }.count
+                    print("🟣 [HomeViewModel] 豆瓣热门电影: 海报缺失=\(movieMissingPoster)")
+                    let moviePosterSamples = moviesArray.prefix(3).map { $0.posterPath ?? "<nil>" }.joined(separator: " | ")
+                    print("🔎 [HomeViewModel] 豆瓣电影 posterPath 样本: \(moviePosterSamples)")
+
+                    await MainActor.run {
+                        self.doubanHotMovies = moviesArray
+                        self.cacheManager.saveDoubanHotMovies(moviesArray)
+                    }
+                } catch {
+                    print("❌ [HomeViewModel] 豆瓣热门电影 失败: \(error)")
+                }
             }
-            TopShelfHelper.shared.updateTopShelfRecommendations(tmdbArray)
-            
-            print("✅ [HomeViewModel] 推荐内容已保存到缓存")
-            
-        } catch {
-            print("❌ [HomeViewModel] 刷新失败: \(error)")
-            if let apiError = error as? APIError {
-                print("   API Error: \(apiError.localizedDescription)")
+
+            // 豆瓣国产剧集
+            group.addTask {
+                do {
+                    print("📡 [HomeViewModel] 请求 douban_tv_weekly_chinese...")
+                    let doubanTVStartTime = Date()
+                    let tvs = try await self.apiService.getRecommendations(source: "douban_tv_weekly_chinese")
+                    let tvsArray = Array(tvs.prefix(10))
+
+                    let duration = Date().timeIntervalSince(doubanTVStartTime) * 1000
+                    print("✅ [HomeViewModel] 豆瓣国产剧集: \(tvsArray.count) 项 (\(String(format: "%.0f", duration))ms)")
+
+                    let tvMissingPoster = tvsArray.filter { ($0.posterPath ?? "").isEmpty }.count
+                    print("🟣 [HomeViewModel] 豆瓣国产剧集: 海报缺失=\(tvMissingPoster)")
+                    let tvPosterSamples = tvsArray.prefix(3).map { $0.posterPath ?? "<nil>" }.joined(separator: " | ")
+                    print("🔎 [HomeViewModel] 豆瓣剧集 posterPath 样本: \(tvPosterSamples)")
+
+                    await MainActor.run {
+                        self.doubanHotTVs = tvsArray
+                        self.cacheManager.saveDoubanHotTVs(tvsArray)
+                    }
+                } catch {
+                    print("❌ [HomeViewModel] 豆瓣国产剧集 失败: \(error)")
+                }
             }
-            errorMessage = "刷新推荐内容失败: \(error.localizedDescription)"
-            showError = true
         }
-        
+
+        let totalDuration = Date().timeIntervalSince(startTime) * 1000
+        print("✅ [HomeViewModel] 首页推荐刷新完成 (总耗时: \(String(format: "%.0f", totalDuration))ms)")
+        print("   TMDB=\(tmdbTrending.count), 豆瓣电影=\(doubanHotMovies.count), 豆瓣国产剧集=\(doubanHotTVs.count)")
+
         isLoadingTrending = false
     }
     

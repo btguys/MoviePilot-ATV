@@ -40,7 +40,7 @@ struct SubscriptionsView: View {
                     
                     Divider()
                         .background(ColorTokens.divider)
-                        .padding(.horizontal, 90)
+                        .padding(.horizontal, 55)
                     
                     // Content
                     if viewModel.isLoading {
@@ -50,7 +50,7 @@ struct SubscriptionsView: View {
                         EmptyStateView(icon: "bookmark.slash", title: "暂无订阅", subtitle: "去搜索页面添加订阅")
                     } else {
                         subscriptionCardsView()
-                            .padding(.horizontal, 90)
+                            .padding(.horizontal, 55)
                             .padding(.vertical, 30)
                     }
                 }
@@ -226,7 +226,7 @@ struct SubscriptionCardContent: View {
         VStack(alignment: .center, spacing: 10) {
             // Poster
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(ColorTokens.surfaceCard)
                 if let posterURL = subscription.posterURL {
                     CachedAsyncImage(url: posterURL) { phase in
@@ -281,7 +281,7 @@ struct SubscriptionCardContent: View {
                 }
                 .padding(6)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             
             // Title
             Text(subscription.name ?? "未知")

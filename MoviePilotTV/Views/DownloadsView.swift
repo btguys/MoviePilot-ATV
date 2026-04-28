@@ -26,7 +26,7 @@ struct DownloadsView: View {
                 
                 Spacer()
             }
-            .padding(.horizontal, 90)
+            .padding(.horizontal, 55)
             .padding(.vertical, 30)
             
             Divider()
@@ -53,7 +53,7 @@ struct DownloadsView: View {
                         // Bottom spacing
                         Color.clear.frame(height: 60)
                     }
-                    .padding(.horizontal, 90)
+                    .padding(.horizontal, 55)
                     .padding(.top, 30)
                 }
             }
@@ -261,7 +261,7 @@ struct DownloadTaskCard: View {
             .scaleEffect(isFocused ? 1.05 : 1.0)
             .shadow(color: isFocused ? Color.blue.opacity(0.6) : Color.clear, radius: 12, x: 0, y: 0)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .stroke(isFocused ? Color.blue : Color.clear, lineWidth: 3)
             )
             .animation(.easeInOut(duration: 0.2), value: isFocused)

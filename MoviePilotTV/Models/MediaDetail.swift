@@ -140,9 +140,9 @@ struct MediaDetail: Codable {
         } else {
             rawURL = "https://image.tmdb.org/t/p/w500\(posterPath)"
         }
-        return URL(string: applyImageProxyIfNeeded(rawURL))
+        return URL(string: applyDoubanImageProxy(rawURL))
     }
-    
+
     var backdropURL: URL? {
         guard let backdropPath = backdropPath, !backdropPath.isEmpty else { return nil }
         let rawURL: String
@@ -151,7 +151,7 @@ struct MediaDetail: Codable {
         } else {
             rawURL = "https://image.tmdb.org/t/p/original\(backdropPath)"
         }
-        return URL(string: applyImageProxyIfNeeded(rawURL))
+        return URL(string: applyDoubanImageProxy(rawURL))
     }
     
     var displayTitle: String {
@@ -168,16 +168,15 @@ struct MediaDetail: Codable {
 }
 
 // MARK: - Image proxy helper
-private extension MediaDetail {
-    func applyImageProxyIfNeeded(_ urlString: String) -> String {
-        let lower = urlString.lowercased()
-        let isDouban = (source?.lowercased().contains("douban") ?? false) || lower.contains("doubanio.com")
-        guard isDouban else { return urlString }
-        let encoded = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? urlString
-        let base = UserDefaults.standard.string(forKey: "apiEndpoint")?.trimmingCharacters(in: CharacterSet(charactersIn: "/ ")) ?? ""
-        guard !base.isEmpty else { return urlString }
-        return "\(base)/api/v1/system/img/0?imgurl=\(encoded)"
-    }
+/// Routes doubanio.com image URLs through the MoviePilot image proxy API.
+/// Used by both MediaDetail (poster/backdrop) and PersonInfo (profile avatars).
+func applyDoubanImageProxy(_ urlString: String) -> String {
+    let lower = urlString.lowercased()
+    guard lower.contains("doubanio.com") else { return urlString }
+    let encoded = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? urlString
+    let base = UserDefaults.standard.string(forKey: "apiEndpoint")?.trimmingCharacters(in: CharacterSet(charactersIn: "/ ")) ?? ""
+    guard !base.isEmpty else { return urlString }
+    return "\(base)/api/v1/system/img/0?imgurl=\(encoded)"
 }
 
 struct SeasonInfo: Codable {
@@ -410,19 +409,25 @@ struct PersonInfo: Codable {
     }
     
     var profileURL: URL? {
+        // Resolve raw URL from TMDB profilePath or Douban avatar
+        let rawURL: String?
         if let path = profilePath, !path.isEmpty {
             if path.hasPrefix("http") {
-                return URL(string: path)
+                rawURL = path
+            } else {
+                rawURL = "https://image.tmdb.org/t/p/w185\(path)"
             }
-            return URL(string: "https://image.tmdb.org/t/p/w185\(path)")
+        } else if let large = avatar?.large, !large.isEmpty {
+            rawURL = large
+        } else if let normal = avatar?.normal, !normal.isEmpty {
+            rawURL = normal
+        } else {
+            rawURL = nil
         }
-        if let large = avatar?.large, !large.isEmpty {
-            return URL(string: large)
-        }
-        if let normal = avatar?.normal, !normal.isEmpty {
-            return URL(string: normal)
-        }
-        return nil
+        guard let rawURL else { return nil }
+        // Route douban images through proxy
+        let finalURL = applyDoubanImageProxy(rawURL)
+        return URL(string: finalURL)
     }
 }
 

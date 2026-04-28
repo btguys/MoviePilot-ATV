@@ -662,11 +662,9 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = MoviePilotTVTopShelf/MoviePilotTVTopShelf.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=appletvos*]" = GZBG3L22Y5;
+				DEVELOPMENT_TEAM = GZBG3L22Y5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MoviePilotTVTopShelf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MoviePilotTVTopShelf;
@@ -680,7 +678,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.hvg.moviepilot-atv.MoviePilotTVTopShelf";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "mp atv top shelf extension";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -688,7 +685,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 26.2;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Debug;
 		};
@@ -697,11 +694,9 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = MoviePilotTVTopShelf/MoviePilotTVTopShelf.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=appletvos*]" = GZBG3L22Y5;
+				DEVELOPMENT_TEAM = GZBG3L22Y5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MoviePilotTVTopShelf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MoviePilotTVTopShelf;
@@ -715,7 +710,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.hvg.moviepilot-atv.MoviePilotTVTopShelf";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "mp atv top shelf extension";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -723,7 +717,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 26.2;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Release;
 		};

@@ -28,7 +28,7 @@ struct SitesView: View {
                 
                 Spacer()
             }
-            .padding(.horizontal, 90)
+            .padding(.horizontal, 55)
             .padding(.vertical, 30)
             
             Divider()
@@ -112,7 +112,7 @@ struct SiteCardView: View {
     
     private var siteIcon: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(ColorTokens.accent.opacity(0.2))
                 .frame(width: 64, height: 64)
             

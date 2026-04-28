@@ -185,10 +185,10 @@ struct SystemStatusCard: View {
             .foregroundColor(ColorTokens.textPrimary)
             .padding(16)
                 .background(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 16)
                         .fill(Color.black.opacity(0.85))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
+                            RoundedRectangle(cornerRadius: 16)
                                 .stroke(ColorTokens.progressTrack, lineWidth: 1)
                         )
                 )

@@ -62,9 +62,9 @@ struct MediaItem: Codable, Identifiable, Equatable, Hashable {
         } else {
             rawURL = "https://image.tmdb.org/t/p/w500\(posterPath)"
         }
-        return URL(string: applyImageProxyIfNeeded(rawURL))
+        return URL(string: applyDoubanImageProxy(rawURL))
     }
-    
+
     var backdropURL: URL? {
         guard let backdropPath = backdropPath, !backdropPath.isEmpty else { return nil }
         // API 已经返回完整的 URL
@@ -74,7 +74,7 @@ struct MediaItem: Codable, Identifiable, Equatable, Hashable {
         } else {
             rawURL = "https://image.tmdb.org/t/p/original\(backdropPath)"
         }
-        return URL(string: applyImageProxyIfNeeded(rawURL))
+        return URL(string: applyDoubanImageProxy(rawURL))
     }
     
     var displayTitle: String {
@@ -117,15 +117,5 @@ struct MediaItem: Codable, Identifiable, Equatable, Hashable {
             originalLanguage: nil,
             source: nil
         )
-    }
-
-    private func applyImageProxyIfNeeded(_ urlString: String) -> String {
-        let lower = urlString.lowercased()
-        let isDouban = (source?.lowercased().contains("douban") ?? false) || lower.contains("doubanio.com")
-        guard isDouban else { return urlString }
-        let encoded = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? urlString
-        let base = UserDefaults.standard.string(forKey: "apiEndpoint")?.trimmingCharacters(in: CharacterSet(charactersIn: "/ ")) ?? ""
-        guard !base.isEmpty else { return urlString }
-        return "\(base)/api/v1/system/img/0?imgurl=\(encoded)"
     }
 }

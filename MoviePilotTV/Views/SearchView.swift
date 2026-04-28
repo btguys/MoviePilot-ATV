@@ -52,12 +52,12 @@ struct SearchView: View {
                     .cornerRadius(10)
                     .frame(maxWidth: 700)
                 }
-                .padding(.horizontal, 90)
+                .padding(.horizontal, 55)
                 .padding(.vertical, 25)
                 
                 Divider()
                     .background(ColorTokens.divider)
-                    .padding(.horizontal, 90)
+                    .padding(.horizontal, 55)
                 
                 // Search Results
                 if viewModel.isSearching {
@@ -70,9 +70,9 @@ struct SearchView: View {
                 } else {
                     LazyVGrid(
                         columns: [
-                            GridItem(.adaptive(minimum: 220), spacing: 22)
+                            GridItem(.adaptive(minimum: 250), spacing: 32)
                         ],
-                        spacing: 36
+                        spacing: 40
                     ) {
                         ForEach(viewModel.searchResults) { media in
                             NavigationLink(destination: MediaDetailView(media: media)) {
@@ -81,7 +81,7 @@ struct SearchView: View {
                             .buttonStyle(.card)
                         }
                     }
-                    .padding(.horizontal, 90)
+                    .padding(.horizontal, 55)
                     .padding(.vertical, 44) // 为放大预留更多上下空间，避免裁切
                     .focusSection()  // 添加焦点区域
                     
@@ -116,7 +116,7 @@ struct SearchResultCard: View {
     
     var body: some View {
         MediaCard(media: media)
-            .frame(width: 220)
+            .frame(width: 250)
     }
 }
 

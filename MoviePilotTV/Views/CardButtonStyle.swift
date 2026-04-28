@@ -15,7 +15,7 @@ struct CardButtonStyle: ButtonStyle {
             .padding(isFocused ? 4 : 0) // 留出缓冲，避免内部内容顶到边缘
             .background(Color.clear)
             .scaleEffect(isFocused ? 1.05 : 1.0)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(color: isFocused ? ColorTokens.focusCardGlow : .clear, radius: 12)
             .animation(.easeInOut(duration: 0.2), value: isFocused)
     }

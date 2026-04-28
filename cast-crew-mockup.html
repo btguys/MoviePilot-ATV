@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>演职员区域 · 前后对比 Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #fff; font-family: -apple-system, 'PingFang SC', sans-serif; padding: 40px 60px; }
+
+  h2 { font-size: 22px; color: #999; margin: 50px 0 30px; border-bottom: 1px solid #333; padding-bottom: 12px; }
+  .section-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+
+  /* ─── BEFORE ─── */
+  .before-section-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+  .before-actors { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; }
+  .before-actor-card { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; width: 100px; }
+  .before-actor-img { width: 80px; height: 80px; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
+  .before-actor-img.placeholder { background: #2a2a2a; }
+  .before-actor-img img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .before-actor-name { font-size: 12px; color: #ccc; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+  .before-actor-role { font-size: 10px; color: #888; text-align: center; }
+
+  .before-crew-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 20px; }
+  .before-crew-cell { padding: 8px 0; }
+  .before-crew-role { font-size: 13px; color: #aaa; }
+  .before-crew-name { font-size: 14px; font-weight: 600; }
+
+  /* ─── AFTER ─── */
+  .after-section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px; }
+  .after-section-title { font-size: 28px; font-weight: 700; }
+  .after-section-count { font-size: 16px; color: #666; }
+  .after-actors { display: flex; gap: 28px; overflow-x: auto; padding-bottom: 16px; }
+  .after-card { flex-shrink: 0; width: 150px; display: flex; flex-direction: column; gap: 10px; }
+  .after-card-img-wrapper { width: 150px; height: 200px; border-radius: 14px; overflow: hidden; background: #1a1a1a; }
+  .after-card-img-wrapper.placeholder { background: #1a1a1a; display: flex; align-items: center; justify-content: center; }
+  .after-card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+  .after-card-name { font-size: 16px; font-weight: 600; color: #fff; text-align: center; line-height: 1.3; }
+  .after-card-role { font-size: 13px; color: #888; text-align: center; line-height: 1.3; }
+
+  .person-icon { font-size: 36px; color: #444; }
+
+  /* ─── Side-by-side comparison badge ─── */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-right: 12px; }
+  .badge-before { background: #5c1a1a; color: #ff6b6b; }
+  .badge-after { background: #1a3a1a; color: #4caf50; }
+
+  /* ─── Scrollbar ─── */
+  ::-webkit-scrollbar { height: 6px; }
+  ::-webkit-scrollbar-track { background: #151515; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ==================== ACTOR SECTION ==================== -->
+<h2><span class="badge badge-before">当前</span> <span class="badge badge-after">建议</span> 演员阵容</h2>
+
+<h3 style="font-size:16px;color:#777;margin-bottom:24px;">← 当前：圆形头像，字体小，豆瓣来源无头像无角色 | 建议：圆角矩形卡片，更大更清晰 →</h3>
+
+<div style="display:flex; gap:60px;">
+
+  <!-- BEFORE: Current actor layout -->
+  <div style="flex:0 0 auto; max-width:420px;">
+    <div class="section-label">当前</div>
+    <div class="before-section-title">演员阵容</div>
+    <div class="before-actors">
+      <div class="before-actor-card">
+        <div class="before-actor-img placeholder"><span class="person-icon">👤</span></div>
+        <div class="before-actor-name">Jaafar Jackson</div>
+        <div class="before-actor-role">Michael Jackson</div>
+      </div>
+      <div class="before-actor-card">
+        <div class="before-actor-img placeholder"><span class="person-icon">👤</span></div>
+        <div class="before-actor-name">科尔曼·多明戈</div>
+        <div class="before-actor-role">Joseph Jackson</div>
+      </div>
+      <div class="before-actor-card">
+        <div class="before-actor-img placeholder"><span class="person-icon">👤</span></div>
+        <div class="before-actor-name">尼娅·朗</div>
+        <div class="before-actor-role">Katherine Jackson</div>
+      </div>
+      <div class="before-actor-card">
+        <div class="before-actor-img placeholder"><span class="person-icon">👤</span></div>
+        <div class="before-actor-name">Juliano Krue</div>
+        <div class="before-actor-role">Young Michael</div>
+      </div>
+      <div class="before-actor-card">
+        <div class="before-actor-img placeholder"><span class="person-icon">👤</span></div>
+        <div class="before-actor-name">凯琳·琼斯</div>
+        <div class="before-actor-role">Bill Bray</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFTER: Proposed actor layout -->
+  <div style="flex:1;">
+    <div class="section-label">建议</div>
+    <div class="after-section-header">
+      <span class="after-section-title">演员阵容</span>
+      <span class="after-section-count">共 15 位</span>
+    </div>
+    <div class="after-actors">
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">Jaafar Jackson</div>
+        <div class="after-card-role">饰 Michael Jackson</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">科尔曼·多明戈</div>
+        <div class="after-card-role">饰 Joseph Jackson</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">尼娅·朗</div>
+        <div class="after-card-role">饰 Katherine Jackson</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">Juliano Krue Valdi</div>
+        <div class="after-card-role">饰 Young Michael</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">凯琳·琼斯</div>
+        <div class="after-card-role">饰 Bill Bray</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">迈尔斯·特勒</div>
+        <div class="after-card-role">饰 John Branca</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== CREW SECTION ==================== -->
+<h2><span class="badge badge-before">当前</span> <span class="badge badge-after">建议</span> 主创团队</h2>
+
+<h3 style="font-size:16px;color:#777;margin-bottom:24px;">← 当前：纯文字 3列 Grid，英文职位标签，无头像 | 建议：圆角矩形卡片，中文标签，带头像 →</h3>
+
+<div style="display:flex; gap:60px;">
+
+  <!-- BEFORE: Current crew layout -->
+  <div style="flex:0 0 auto; max-width:460px;">
+    <div class="section-label">当前</div>
+    <div class="before-section-title">主创团队</div>
+    <div class="before-crew-grid">
+      <div class="before-crew-cell"><div class="before-crew-role">Director</div><div class="before-crew-name">安东尼·福奎阿</div></div>
+      <div class="before-crew-cell"><div class="before-crew-role">Writer</div><div class="before-crew-name">约翰·洛根</div></div>
+      <div class="before-crew-cell"><div class="before-crew-role">Producer</div><div class="before-crew-name">Graham King</div></div>
+      <div class="before-crew-cell"><div class="before-crew-role">Producer</div><div class="before-crew-name">John Branca</div></div>
+      <div class="before-crew-cell"><div class="before-crew-role">Producer</div><div class="before-crew-name">John McClain</div></div>
+      <div class="before-crew-cell"><div class="before-crew-role">Editor</div><div class="before-crew-name">John Ottman</div></div>
+      <div class="before-crew-cell"><div class="before-crew-role">Editor</div><div class="before-crew-name">Harry Yoon</div></div>
+      <div class="before-crew-cell"><div class="before-crew-role">Producer</div><div class="before-crew-name">安东尼·斯塔尔</div></div>
+      <div class="before-crew-cell"><div class="before-crew-role">Producer</div><div class="before-crew-name">卡尔·厄本</div></div>
+    </div>
+  </div>
+
+  <!-- AFTER: Proposed crew layout -->
+  <div style="flex:1;">
+    <div class="section-label">建议</div>
+    <div class="after-section-header">
+      <span class="after-section-title">主创团队</span>
+      <span class="after-section-count">共 9 位</span>
+    </div>
+    <div class="after-actors">
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">安东尼·福奎阿</div>
+        <div class="after-card-role">导演</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">约翰·洛根</div>
+        <div class="after-card-role">编剧</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">Graham King</div>
+        <div class="after-card-role">制片人</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">John Branca</div>
+        <div class="after-card-role">制片人</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">John McClain</div>
+        <div class="after-card-role">制片人</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">John Ottman</div>
+        <div class="after-card-role">剪辑</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== DOUBAN DATA FIX ==================== -->
+<h2><span class="badge badge-after">修复</span> 豆瓣来源数据完善</h2>
+
+<h3 style="font-size:16px;color:#777;margin-bottom:24px;">当前豆瓣来源只显示名字(丢失角色和头像)，建议改为显示完整信息（饰 XXX + 豆瓣头像）</h3>
+
+<div style="display:flex; gap:60px;">
+
+  <!-- BEFORE: Douban current -->
+  <div style="flex:0 0 auto; max-width:360px;">
+    <div class="section-label">当前 · 豆瓣电视剧</div>
+    <div class="before-section-title">演员</div>
+    <div class="before-actors">
+      <div class="before-actor-card">
+        <div class="before-actor-img placeholder"><span class="person-icon">👤</span></div>
+        <div class="before-actor-name">唐嫣</div>
+    </div>
+      <div class="before-actor-card">
+        <div class="before-actor-img placeholder"><span class="person-icon">👤</span></div>
+        <div class="before-actor-name">赵又廷</div>
+    </div>
+      <div class="before-actor-card">
+        <div class="before-actor-img placeholder"><span class="person-icon">👤</span></div>
+        <div class="before-actor-name">杨采钰</div>
+    </div>
+      <div class="before-actor-card">
+        <div class="before-actor-img placeholder"><span class="person-icon">👤</span></div>
+        <div class="before-actor-name">冯绍峰</div>
+    </div>
+    </div>
+  </div>
+
+  <!-- AFTER: Douban proposed -->
+  <div style="flex:1;">
+    <div class="section-label">建议 · 豆瓣电视剧</div>
+    <div class="after-section-header">
+      <span class="after-section-title">演员阵容</span>
+      <span class="after-section-count">共 22 位</span>
+    </div>
+    <div class="after-actors">
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">唐嫣</div>
+        <div class="after-card-role">饰 林展翘</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">赵又廷</div>
+        <div class="after-card-role">饰 何韩</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">杨采钰</div>
+        <div class="after-card-role">饰 周媚</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">冯绍峰</div>
+        <div class="after-card-role">饰 贝文祺</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">晏紫东</div>
+        <div class="after-card-role">饰 孤烟</div>
+      </div>
+      <div class="after-card">
+        <div class="after-card-img-wrapper placeholder"><span class="person-icon">👤</span></div>
+        <div class="after-card-name">何蓝逗</div>
+        <div class="after-card-role">饰 蔡掌珠</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== SUMMARY TABLE ==================== -->
+<h2>改动汇总</h2>
+<table style="border-collapse:collapse;width:100%;max-width:800px;font-size:14px;line-height:1.8;">
+<thead>
+<tr style="text-align:left;border-bottom:2px solid #333;">
+<th style="padding:10px 12px;color:#aaa;">项目</th>
+<th style="padding:10px 12px;color:#ff6b6b;">当前</th>
+<th style="padding:10px 12px;color:#4caf50;">建议</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid #222;">
+<td style="padding:10px 12px;">演员卡片形状</td>
+<td style="padding:10px 12px;">Circle 圆形 (130×130)</td>
+<td style="padding:10px 12px;">RoundedRectangle 圆角矩形 (150×200)</td>
+</tr>
+<tr style="border-bottom:1px solid #222;">
+<td style="padding:10px 12px;">卡片间距</td>
+<td style="padding:10px 12px;">20pt</td>
+<td style="padding:10px 12px;">28pt</td>
+</tr>
+<tr style="border-bottom:1px solid #222;">
+<td style="padding:10px 12px;">演员名字字体</td>
+<td style="padding:10px 12px;">castName 20pt semibold (宽120)</td>
+<td style="padding:10px 12px;">castName 20pt semibold (宽140)</td>
+</tr>
+<tr style="border-bottom:1px solid #222;">
+<td style="padding:10px 12px;">角色名字字体</td>
+<td style="padding:10px 12px;">castCharacter 18pt (宽120, 高36)</td>
+<td style="padding:10px 12px;">castCharacter 18pt (宽140, 无高度限制)</td>
+</tr>
+<tr style="border-bottom:1px solid #222;">
+<td style="padding:10px 12px;">主创团队布局</td>
+<td style="padding:10px 12px;">Grid 3列纯文字，无头像</td>
+<td style="padding:10px 12px;">水平ScrollView + 圆角矩形卡片 + 头像</td>
+</tr>
+<tr style="border-bottom:1px solid #222;">
+<td style="padding:10px 12px;">主创团队职位标签</td>
+<td style="padding:10px 12px;">英文 Director / Writer / Producer</td>
+<td style="padding:10px 12px;">中文 导演 / 编剧 / 制片人 / 剪辑 / 摄影 / 音乐</td>
+</tr>
+<tr style="border-bottom:1px solid #222;">
+<td style="padding:10px 12px;">豆瓣演员数据</td>
+<td style="padding:10px 12px;">只有名字列表 (detail.actors)</td>
+<td style="padding:10px 12px;">使用 actorsData 显示头像 + 角色名</td>
+</tr>
+<tr style="border-bottom:1px solid #222;">
+<td style="padding:10px 12px;">区域标题</td>
+<td style="padding:10px 12px;">纯文字，字体不一致</td>
+<td style="padding:10px 12px;">标题 + 数量副标题，统一字体</td>
+</tr>
+<tr>
+<td style="padding:10px 12px;">章节底部间距</td>
+<td style="padding:10px 12px;">紧凑</td>
+<td style="padding:10px 12px;">40pt (给章节间更多呼吸空间)</td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>

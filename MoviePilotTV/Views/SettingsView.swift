@@ -62,7 +62,7 @@ struct SettingsView: View {
                             .cornerRadius(12)
                     }
                 }
-                .padding(.horizontal, 80)
+                .padding(.horizontal, 55)
 
                 // 服务器信息区域
                 VStack(alignment: .leading, spacing: 20) {
@@ -162,7 +162,7 @@ struct SettingsView: View {
                         .cornerRadius(12)
                     }
                 }
-                .padding(.horizontal, 80)
+                .padding(.horizontal, 55)
 
                 // 显示设置
                 VStack(alignment: .leading, spacing: 20) {
@@ -208,7 +208,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 80)
+                .padding(.horizontal, 55)
                 .padding(.top, 20)
 
                 // 退出登录按钮

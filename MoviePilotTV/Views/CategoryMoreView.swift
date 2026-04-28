@@ -42,7 +42,7 @@ struct CategoryMoreView: View {
                             Text(categoryTitle)
                                 .font(.system(size: 48, weight: .bold))
                                 .foregroundColor(.white)
-                                .padding(.horizontal, 80)
+                                .padding(.horizontal, 55)
                                 .padding(.top, 60)
                             
                             // Grid 布局
@@ -90,7 +90,7 @@ struct CategoryMoreView: View {
                                     .frame(width: 200, height: 300)
                                 }
                             }
-                            .padding(.horizontal, 80)
+                            .padding(.horizontal, 55)
                             .padding(.bottom, 60)
                         }
                     }
@@ -133,10 +133,10 @@ private struct CategoryMediaCard: View {
     let media: MediaItem
     
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
+        VStack(alignment: .center, spacing: 12) {
             // 海报图片 - 与 HomeView 的 MediaCard 保持一致
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(Color.white.opacity(0.05))
                 
                 if let posterURL = media.posterURL {
@@ -182,7 +182,7 @@ private struct CategoryMediaCard: View {
                     }
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             
             // 标题 - 居中对齐
             Text(media.title)

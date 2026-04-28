@@ -35,7 +35,7 @@ struct SoftFocusButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .background(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(isFocused ? ColorTokens.surfaceHover : Color.clear)
             )
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
@@ -47,11 +47,20 @@ struct SoftFocusButtonStyle: ButtonStyle {
 // 放大效果按钮样式 - 用于搜索资源和订阅按钮
 struct ScaleFocusButtonStyle: ButtonStyle {
     @Environment(\.isFocused) var isFocused
-    
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(isFocused ? 1.10 : 1.0)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(isFocused ? Color.white.opacity(0.15) : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(isFocused ? Color.white.opacity(0.6) : Color.clear, lineWidth: 2)
+            )
+            .scaleEffect(isFocused ? 1.12 : 1.0)
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .shadow(color: isFocused ? Color.white.opacity(0.35) : Color.clear, radius: 20, x: 0, y: 0)
             .animation(.easeInOut(duration: 0.2), value: isFocused)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }
@@ -64,10 +73,10 @@ struct SearchResultCardButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .background(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(isFocused ? Color.blue.opacity(0.3) : Color(white: 0.12))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: 16)
                             .stroke(isFocused ? Color.blue : Color.clear, lineWidth: 4)
                     )
             )
@@ -145,10 +154,26 @@ struct MediaDetailView: View {
         let kind: TagKind
     }
 
+    // MARK: - Person Card Data (actor & crew unified)
+    private struct PersonCardData: Identifiable {
+        let id: String  // stable identity for focus: "name|subtitle"
+        let name: String
+        let subtitle: String?  // character name or role label
+        let profileURL: URL?
+
+        init(name: String, subtitle: String?, profileURL: URL?) {
+            self.id = "\(name)|\(subtitle ?? "")"
+            self.name = name
+            self.subtitle = subtitle
+            self.profileURL = profileURL
+        }
+    }
+
     private struct CrewItem: Identifiable {
         let id = UUID()
-        let role: String
+        let role: String  // Chinese job label
         let name: String
+        let profileURL: URL?
     }
 
     private struct SeasonCard: Identifiable {
@@ -247,8 +272,7 @@ struct MediaDetailView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: UIScreen.main.bounds.height)
                     .padding(.top, -80)
-                    .clipped()
-                    .ignoresSafeArea(edges: .top)
+                    .ignoresSafeArea()
                     .id("heroTop")
                 detailContentSection(detail: detail)
             }
@@ -348,7 +372,7 @@ struct MediaDetailView: View {
                     Spacer()
 
                     // Main content anchored at bottom
-                    HStack(alignment: .bottom, spacing: 40) {
+                    HStack(alignment: .bottom, spacing: 48) {
                         // Left: poster + (title over buttons)
                         HStack(alignment: .bottom, spacing: 20) {
                             if let posterURL = detail.posterURL {
@@ -362,7 +386,7 @@ struct MediaDetailView: View {
                                         Color.gray.opacity(0.3)
                                     }
                                 }
-                                .frame(width: 240, height: 360)
+                                .frame(width: 280, height: 420)
                                 .cornerRadius(12)
                                 .shadow(radius: 20)
                             }
@@ -399,8 +423,8 @@ struct MediaDetailView: View {
                                             Text("搜索资源")
                                                 .font(FontTokens.buttonText)
                                         }
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 12)
+                                        .padding(.horizontal, 18)
+                                        .padding(.vertical, 14)
                                         .background(ColorTokens.divider)
                                         .cornerRadius(10)
                                     }
@@ -423,8 +447,8 @@ struct MediaDetailView: View {
                                                     .font(FontTokens.buttonText)
                                                     .foregroundColor(viewModel.isSubscribed ? .red : .yellow)
                                             }
-                                            .padding(.horizontal, 16)
-                                            .padding(.vertical, 12)
+                                            .padding(.horizontal, 18)
+                                            .padding(.vertical, 14)
                                             .background(viewModel.isSubscribed ? Color.red.opacity(0.2) : Color.yellow.opacity(0.2))
                                             .cornerRadius(10)
                                         }
@@ -466,8 +490,8 @@ struct MediaDetailView: View {
                                             Text("Infuse播放")
                                                 .font(FontTokens.buttonText)
                                         }
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 12)
+                                        .padding(.horizontal, 18)
+                                        .padding(.vertical, 14)
                                         .background(needsTmdbKey ? Color.gray.opacity(0.5) : Color.orange.opacity(0.9))
                                         .cornerRadius(10)
                                     }
@@ -558,8 +582,8 @@ struct MediaDetailView: View {
                         .padding(.bottom, 10)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                     }
-                    .padding(.leading, 80)
-                    .padding(.trailing, 80)
+                    .padding(.leading, 90)
+                    .padding(.trailing, 90)
                     .padding(.bottom, 30)
                 }
             }
@@ -579,115 +603,31 @@ struct MediaDetailView: View {
             seasonsSection(detail: detail)
             crewGridSection(detail: detail)
 
-            // Cast from Credits API - 可聚焦
+            // Actor section — unified design: rounded-rect cards with profile images
+            // Priority: TMDB credits API > Douban PersonInfo from detail
             if let cast = viewModel.credits?.cast, !cast.isEmpty {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("演员阵容")
-                        .font(FontTokens.sectionTitle)
-                        .foregroundColor(ColorTokens.textPrimary)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 20) {
-                            ForEach(cast.prefix(15)) { member in
-                                Button(action: {}) {
-                                    VStack(spacing: 8) {
-                                        // Profile Image
-                                        if let profileURL = member.profileURL {
-                                            CachedAsyncImage(url: profileURL) { phase in
-                                                switch phase {
-                                                case .success(let image):
-                                                    image
-                                                        .resizable()
-                                                        .aspectRatio(contentMode: .fill)
-                                                        .frame(width: 120, height: 120)
-                                                        .clipShape(Circle())
-                                                case .failure, .empty:
-                                                    Circle()
-                                                        .fill(Color.gray.opacity(0.3))
-                                                        .frame(width: 120, height: 120)
-                                                        .overlay(
-                                                            Image(systemName: "person.fill")
-                                                                .font(.system(size: 40))
-                                                                .foregroundColor(ColorTokens.textDim)
-                                                        )
-                                                @unknown default:
-                                                    Circle()
-                                                        .fill(Color.gray.opacity(0.3))
-                                                        .frame(width: 120, height: 120)
-                                                }
-                                            }
-                                        } else {
-                                            Circle()
-                                                .fill(Color.gray.opacity(0.3))
-                                                .frame(width: 120, height: 120)
-                                                .overlay(
-                                                    Image(systemName: "person.fill")
-                                                        .font(.system(size: 40))
-                                                        .foregroundColor(ColorTokens.textDim)
-                                                )
-                                        }
-                                        
-                                        // Name
-                                        Text(member.name)
-                                            .font(FontTokens.castName)
-                                            .foregroundColor(ColorTokens.textPrimary)
-                                            .lineLimit(1)
-                                            .frame(width: 120)
-                                        
-                                        // Character
-                                        if let character = member.character {
-                                            Text(character)
-                                                .font(FontTokens.castCharacter)
-                                                .foregroundColor(ColorTokens.textSecondary)
-                                                .lineLimit(2)
-                                                .multilineTextAlignment(.center)
-                                                .frame(width: 120, height: 36)
-                                        }
-                                    }
-                                }
-                                .buttonStyle(SoftFocusButtonStyle())
-                            }
-                        }
-                        .padding(.vertical, 10)
-                    }
+                let items = cast.prefix(15).map { member in
+                    PersonCardData(
+                        name: member.name,
+                        subtitle: member.character.map { "饰 \($0)" },
+                        profileURL: member.profileURL
+                    )
                 }
-                .focusSection()  // 设置演员阵容为独立焦点区域
-            }
-            // Fallback: 如果没有 Credits 数据，显示旧的演员列表
-            else if let actors = detail.actors, !actors.isEmpty {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("演员")
-                        .font(FontTokens.settingsSectionTitle)
-                        .foregroundColor(ColorTokens.textPrimary)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 20) {
-                            ForEach(actors.prefix(10), id: \.self) { actor in
-                                Button(action: {}) {
-                                    VStack(spacing: 8) {
-                                        Circle()
-                                            .fill(Color.gray.opacity(0.3))
-                                            .frame(width: 100, height: 100)
-                                            .overlay(
-                                                Image(systemName: "person.fill")
-                                                    .font(.system(size: 40))
-                                                    .foregroundColor(ColorTokens.textDim)
-                                            )
-                                        
-                                        Text(actor)
-                                            .font(FontTokens.castCharacter)
-                                            .foregroundColor(ColorTokens.textPrimary)
-                                            .lineLimit(2)
-                                            .multilineTextAlignment(.center)
-                                            .frame(width: 100)
-                                    }
-                                }
-                                .buttonStyle(SoftFocusButtonStyle())
-                            }
-                        }
-                    }
+                personScrollSection(title: "演员阵容", count: items.count, items: items)
+                    .focusSection()
+            } else if let actorsData = detail.actorsData, !actorsData.isEmpty {
+                let items = actorsData.prefix(15).map { person in
+                    PersonCardData(
+                        name: person.name ?? "",
+                        subtitle: person.character.flatMap { ch in
+                            // Douban character can be "演员" (just label) or "饰 林展翘" (specific role)
+                            ch == "演员" || ch == "配音" ? nil : ch
+                        },
+                        profileURL: person.profileURL
+                    )
                 }
-                .focusSection()  // 设置演员为独立焦点区域
+                personScrollSection(title: "演员阵容", count: items.count, items: items)
+                    .focusSection()
             }
             
             // Search Results
@@ -763,46 +703,112 @@ struct MediaDetailView: View {
     private func crewGridSection(detail: MediaDetail) -> some View {
         let items = crewItems(detail: detail)
         if !items.isEmpty {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("主创团队")
-                    .font(FontTokens.sectionTitle)
-                    .foregroundColor(ColorTokens.textPrimary)
-                
-                // 使用普通Grid而非LazyVGrid，确保立即渲染
-                Grid(alignment: .leading, horizontalSpacing: 24, verticalSpacing: 18) {
-                    ForEach(0..<((items.count + 2) / 3), id: \.self) { rowIndex in
-                        GridRow {
-                            ForEach(0..<3, id: \.self) { colIndex in
-                                let index = rowIndex * 3 + colIndex
-                                if index < items.count {
-                                    let item = items[index]
-                                    Button(action: {}) {
-                                        VStack(alignment: .leading, spacing: 6) {
-                                            Text(item.role)
-                                                .font(FontTokens.castName)
-                                                .foregroundColor(ColorTokens.textPrimary.opacity(0.9))
-                                            Text(item.name)
-                                                .font(.system(size: 20, weight: .semibold))
-                                                .foregroundColor(ColorTokens.textPrimary)
-                                                .lineLimit(1)
-                                                .multilineTextAlignment(.leading)
-                                        }
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    }
-                                    .buttonStyle(SoftFocusButtonStyle())
-                                } else {
-                                    Color.clear
-                                        .frame(maxWidth: .infinity)
-                                }
-                            }
-                        }
-                    }
-                }
-                .focusSection()  // 设置主创团队为独立焦点区域
+            let cards = items.map { item in
+                PersonCardData(name: item.name, subtitle: item.role, profileURL: item.profileURL)
             }
+            personScrollSection(title: "主创团队", count: cards.count, items: cards)
+                .focusSection()
         }
     }
     
+    // MARK: - Chinese job label mapping
+    private func chineseJobLabel(_ english: String) -> String {
+        let lower = english.lowercased()
+        if lower.contains("director") { return "导演" }
+        if lower.contains("writer") || lower.contains("screenplay") || lower.contains("story") { return "编剧" }
+        if lower.contains("producer") { return "制片人" }
+        if lower.contains("editor") { return "剪辑" }
+        if lower.contains("cinematograph") || lower.contains("photograph") { return "摄影" }
+        if lower.contains("music") || lower.contains("composer") { return "音乐" }
+        return english
+    }
+
+    // MARK: - Person Card Component
+    private struct PersonCard: View {
+        let person: PersonCardData
+        private let cardWidth: CGFloat = 140
+        private let imageHeight: CGFloat = 187
+
+        var body: some View {
+            Button(action: {}) {
+                VStack(spacing: 10) {
+                    // Profile Image
+                    if let profileURL = person.profileURL {
+                        CachedAsyncImage(url: profileURL) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: cardWidth, height: imageHeight)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                            case .failure, .empty:
+                                personPlaceholder
+                            @unknown default:
+                                personPlaceholder
+                            }
+                        }
+                    } else {
+                        personPlaceholder
+                    }
+
+                    // Name
+                    Text(person.name)
+                        .font(FontTokens.castName)
+                        .foregroundColor(ColorTokens.textPrimary)
+                        .lineLimit(1)
+                        .frame(width: cardWidth)
+
+                    // Subtitle
+                    if let subtitle = person.subtitle, !subtitle.isEmpty {
+                        Text(subtitle)
+                            .font(FontTokens.castCharacter)
+                            .foregroundColor(ColorTokens.textSecondary)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.center)
+                            .frame(width: cardWidth)
+                    }
+                }
+            }
+            .buttonStyle(SoftFocusButtonStyle())
+        }
+
+        @ViewBuilder
+        private var personPlaceholder: some View {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: cardWidth, height: imageHeight)
+                .overlay(
+                    Image(systemName: "person.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(ColorTokens.textDim)
+                )
+        }
+    }
+
+    // MARK: - Person Scroll Section Builder
+    private func personScrollSection(title: String, count: Int, items: [PersonCardData]) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(title)
+                    .font(FontTokens.sectionTitle)
+                    .foregroundColor(ColorTokens.textPrimary)
+                Text("共 \(count) 位")
+                    .font(FontTokens.caption)
+                    .foregroundColor(ColorTokens.textSecondary)
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 28) {
+                    ForEach(items) { item in
+                        PersonCard(person: item)
+                    }
+                }
+                .padding(.vertical, 10)
+            }
+        }
+    }
+
     // MARK: - 加载动画视图
     @ViewBuilder
     private func loadingAnimationView() -> some View {
@@ -1007,7 +1013,7 @@ struct MediaDetailView: View {
             pendingDownload = torrent
             showDownloadConfirm = true
         }) {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 14) {
                 // 标题和站点
                 HStack(spacing: 12) {
                     // 序号
@@ -1208,58 +1214,57 @@ struct MediaDetailView: View {
     // 主创表格数据聚合：一行一个角色
     private func crewItems(detail: MediaDetail) -> [CrewItem] {
         let crew = viewModel.credits?.crew ?? []
-        
-        func dedupPairs(_ pairs: [(String, String)]) -> [(String, String)] {
-            var seen = Set<String>()
-            var result: [(String, String)] = []
-            for (role, name) in pairs {
-                let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !trimmedName.isEmpty else { continue }
-                let key = role.lowercased() + "|" + trimmedName.lowercased()
-                guard !seen.contains(key) else { continue }
-                seen.insert(key)
-                result.append((role, trimmedName))
-            }
-            return result
-        }
-        
-        func rolePairs(_ role: String, where predicate: (String) -> Bool) -> [(String, String)] {
-            crew.compactMap { member in
-                guard let job = member.job?.lowercased(), predicate(job) else { return nil }
-                return (role, member.name)
+
+        // Build name → profileURL lookup from TMDB crew members
+        var crewProfileMap: [String: URL] = [:]
+        for member in crew {
+            if let url = member.profileURL {
+                crewProfileMap[member.name.lowercased()] = url
             }
         }
-        
-        var entries: [(String, String)] = []
-        
-        // Directors: API directorsData first, then crew with "director"
-        let directorNames = detail.directorsData?.compactMap { $0.name } ?? []
-        entries.append(contentsOf: directorNames.map { ("Director", $0) })
-        entries.append(contentsOf: rolePairs("Director") { $0.contains("director") })
-        
-        entries.append(contentsOf: rolePairs("Writer") { job in
-            job.contains("writer") || job.contains("screenplay") || job.contains("story")
-        })
-        
-        entries.append(contentsOf: rolePairs("Producer") { job in
-            job.contains("producer")
-        })
-        
-        entries.append(contentsOf: rolePairs("Editor") { job in
-            job.contains("editor")
-        })
-        
-        entries.append(contentsOf: rolePairs("Cinematography") { job in
-            job.contains("cinematograph") || job.contains("photograph")
-        })
-        
-        entries.append(contentsOf: rolePairs("Music") { job in
-            job.contains("music") || job.contains("composer")
-        })
-        
-        // Dedup and limit to keep layout clean
-        let deduped = dedupPairs(entries)
-        return Array(deduped.prefix(18)).map { CrewItem(role: $0.0, name: $0.1) }
+
+        var items: [CrewItem] = []
+        var seen = Set<String>()  // dedup key: "role|name"
+
+        func append(role: String, name: String, profileURL: URL? = nil) {
+            let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return }
+            let key = role.lowercased() + "|" + trimmed.lowercased()
+            guard !seen.contains(key) else { return }
+            seen.insert(key)
+            let url = profileURL ?? crewProfileMap[trimmed.lowercased()]
+            items.append(CrewItem(role: chineseJobLabel(role), name: trimmed, profileURL: url))
+        }
+
+        // Directors: from directorsData first (has profile images for both TMDB & Douban)
+        if let directors = detail.directorsData {
+            for person in directors {
+                guard let name = person.name else { continue }
+                append(role: "Director", name: name, profileURL: person.profileURL)
+            }
+        }
+        // Directors from TMDB crew
+        for member in crew {
+            guard let job = member.job?.lowercased(), job.contains("director") else { continue }
+            append(role: "Director", name: member.name, profileURL: member.profileURL)
+        }
+
+        // Other crew roles
+        let roleMatchers: [(String, (String) -> Bool)] = [
+            ("Writer", { j in j.contains("writer") || j.contains("screenplay") || j.contains("story") }),
+            ("Producer", { j in j.contains("producer") }),
+            ("Editor", { j in j.contains("editor") }),
+            ("Cinematography", { j in j.contains("cinematograph") || j.contains("photograph") }),
+            ("Music", { j in j.contains("music") || j.contains("composer") }),
+        ]
+        for (role, predicate) in roleMatchers {
+            for member in crew {
+                guard let job = member.job?.lowercased(), predicate(job) else { continue }
+                append(role: role, name: member.name, profileURL: member.profileURL)
+            }
+        }
+
+        return Array(items.prefix(18))
     }
 
     private func getMetaTags(from metaInfo: MetaInfo) -> [String] {
@@ -1654,7 +1659,7 @@ struct MediaDetailView: View {
             }
             .padding(16)
             .background(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(ColorTokens.surfaceCard)
             )
         }
@@ -1738,7 +1743,7 @@ struct MediaDetailView: View {
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(ColorTokens.surfaceCard)
             )
         }

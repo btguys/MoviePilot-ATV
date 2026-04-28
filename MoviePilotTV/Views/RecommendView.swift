@@ -24,11 +24,11 @@ struct RecommendView: View {
                         .foregroundColor(ColorTokens.textMuted)
                 }
                 .padding(.vertical, 25)
-                .padding(.horizontal, 90)
+                .padding(.horizontal, 55)
                 
                 Divider()
                     .background(ColorTokens.divider)
-                    .padding(.horizontal, 90)
+                    .padding(.horizontal, 55)
 
                 // Content
                 if viewModel.isLoading {
@@ -45,7 +45,7 @@ struct RecommendView: View {
                         // Bottom spacing
                         Color.clear.frame(height: 60)
                     }
-                    .padding(.horizontal, 90)
+                    .padding(.horizontal, 55)
                     .padding(.top, 30)
                 }
             }
@@ -106,7 +106,7 @@ struct RecommendSectionView: View {
                     ForEach(displayItems) { item in
                         NavigationLink(value: item) {
                             MediaCard(media: item)
-                                .frame(width: 220)
+                                .frame(width: 250)
                         }
                         .buttonStyle(.cardButton)
                     }
@@ -114,7 +114,7 @@ struct RecommendSectionView: View {
                     // 更多卡片
                     NavigationLink(value: CategoryMoreDestination(source: sourceKey, title: section.title)) {
                         MoreCard()
-                            .frame(width: 220)
+                            .frame(width: 250)
                     }
                     .buttonStyle(.cardButton)
                 }
@@ -130,10 +130,10 @@ struct RecommendSectionView: View {
 
 private struct MoreCard: View {
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
+        VStack(alignment: .center, spacing: 12) {
             // 主卡片区域 - 保持与 MediaCard 相同的宽高比
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
@@ -160,7 +160,7 @@ private struct MoreCard: View {
                         .foregroundColor(.white.opacity(0.7))
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             
             // 占位文字 - 保持与 MediaCard 相同的间距
             Text("")

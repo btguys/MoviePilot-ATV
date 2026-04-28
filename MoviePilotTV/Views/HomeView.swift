@@ -28,7 +28,7 @@ struct HomeView: View {
                         // Hero Section
                         if let featured = heroMedia ?? viewModel.featuredMedia.first {
                             FeaturedMediaCard(media: featured)
-                                .padding(.horizontal, 90)
+                                .padding(.horizontal, 55)
                                 .padding(.top, -20)  // 负数 padding 让 Hero 向上移动，贴近导航栏
                                 .id("heroSection")
                                 .id("heroSection")
@@ -43,8 +43,8 @@ struct HomeView: View {
                             lastFocusedCardId: $lastFocusedCardId,
                             isFirstSection: false
                         )
-                        .padding(.horizontal, 90)
-                        .padding(.vertical, 20)
+                        .padding(.horizontal, 55)
+                        .padding(.vertical, 24)
                         .id("firstSection")
                         .zIndex(1)
                     
@@ -57,21 +57,21 @@ struct HomeView: View {
                     lastFocusedCardId: $lastFocusedCardId,
                     isFirstSection: false
                 )
-                .padding(.horizontal, 90)
-                .padding(.vertical, 20)
+                .padding(.horizontal, 55)
+                .padding(.vertical, 24)
                 .id("doubanMoviesSection")
                 
-                // 豆瓣热门剧集
+                // 豆瓣国产剧集
                 MediaSection(
-                    title: "豆瓣热门剧集",
+                    title: "豆瓣国产剧集",
                     items: viewModel.doubanHotTVs,
                     isLoading: viewModel.isLoadingTrending,
                     focusedCardId: $focusedCardId,
                     lastFocusedCardId: $lastFocusedCardId,
                     isFirstSection: false
                 )
-                .padding(.horizontal, 90)
-                .padding(.vertical, 20)
+                .padding(.horizontal, 55)
+                .padding(.vertical, 24)
                 .id("doubanTVsSection")
                 
                 // Recent Subscriptions
@@ -80,8 +80,8 @@ struct HomeView: View {
                         title: "最近订阅",
                         items: viewModel.recentSubscriptions
                     )
-                    .padding(.horizontal, 90)
-                    .padding(.vertical, 20)
+                    .padding(.horizontal, 55)
+                    .padding(.vertical, 24)
                     .id("subscriptionSection")
                 }
                 
@@ -120,7 +120,7 @@ struct HomeView: View {
                         scrollAnchor = .center
                         heroMedia = focusedMedia
                     } else if let focusedMedia = viewModel.doubanHotTVs.first(where: { $0.id == newValue }) {
-                        // 焦点在豆瓣剧集，滚动到该section
+                        // 焦点在豆瓣国产剧集，滚动到该section
                         targetId = "doubanTVsSection"
                         scrollAnchor = .center
                         heroMedia = focusedMedia
@@ -308,14 +308,14 @@ struct MediaSection: View {
         switch title {
         case "TMDB 流行趋势": return "tmdb_trending"
         case "豆瓣热门电影": return "douban_movie_hot"
-        case "豆瓣热门剧集": return "douban_tv_hot"
+        case "豆瓣国产剧集": return "douban_tv_weekly_chinese"
         default: return "tmdb_trending"
         }
     }
     
     // 判断是否显示更多卡片（只有这三个栏目显示）
     private var showMoreCard: Bool {
-        return title == "TMDB 流行趋势" || title == "豆瓣热门电影" || title == "豆瓣热门剧集"
+        return title == "TMDB 流行趋势" || title == "豆瓣热门电影" || title == "豆瓣国产剧集"
     }
     
     var body: some View {
@@ -329,7 +329,7 @@ struct MediaSection: View {
                     .frame(maxWidth: .infinity, alignment: .center)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: 26) {
+                    LazyHStack(spacing: 32) {
                         ForEach(items) { item in
                             NavigationLink(
                                 destination: MediaDetailView(media: item)
@@ -337,7 +337,7 @@ struct MediaSection: View {
                                     .navigationBarHidden(true)
                             ) {
                                 MediaCard(media: item)
-                                    .frame(width: 220)
+                                    .frame(width: 250)
                             }
                             .buttonStyle(.card)
                             .focused(focusedCardId, equals: item.id)
@@ -347,12 +347,12 @@ struct MediaSection: View {
                         if showMoreCard {
                             NavigationLink(value: CategoryMoreDestination(source: sourceKey, title: title)) {
                                 HomeMoreCard()
-                                    .frame(width: 220)
+                                    .frame(width: 250)
                             }
                             .buttonStyle(.card)
                         }
                     }
-                    .padding(.vertical, 20)
+                    .padding(.vertical, 24)
                     .padding(.horizontal, 20)
                 }
                 .focusSection()
@@ -365,10 +365,10 @@ struct MediaCard: View {
     let media: MediaItem
     
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
+        VStack(alignment: .center, spacing: 12) {
             // Poster
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(ColorTokens.surfaceCard)
                 if let posterURL = media.posterURL {
                     CachedAsyncImage(url: posterURL) { phase in
@@ -419,7 +419,7 @@ struct MediaCard: View {
                     }
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             
             // Title
             Text(media.title)
@@ -458,12 +458,12 @@ struct SubscriptionSection: View {
                                 .navigationBarHidden(true)
                         ) {
                             SubscriptionCardContent(subscription: item)
-                                .frame(width: 220)
+                                .frame(width: 250)
                         }
                         .buttonStyle(.card)
                     }
                 }
-                .padding(.vertical, 20)
+                .padding(.vertical, 24)
                 .padding(.horizontal, 20)
             }
             .focusSection()
@@ -475,10 +475,10 @@ struct SubscriptionSection: View {
 
 private struct HomeMoreCard: View {
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
+        VStack(alignment: .center, spacing: 12) {
             // 主卡片区域 - 保持与 MediaCard 相同的宽高比
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
@@ -505,7 +505,7 @@ private struct HomeMoreCard: View {
                         .foregroundColor(.white.opacity(0.7))
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             
             // 占位文字 - 保持与 MediaCard 相同的间距
             Text("")
