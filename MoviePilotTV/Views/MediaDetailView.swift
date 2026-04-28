@@ -36,7 +36,7 @@ struct SoftFocusButtonStyle: ButtonStyle {
         configuration.label
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isFocused ? Color.white.opacity(0.08) : Color.clear)
+                    .fill(isFocused ? ColorTokens.surfaceHover : Color.clear)
             )
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(.easeInOut(duration: 0.15), value: isFocused)
@@ -113,6 +113,7 @@ struct MediaDetailView: View {
     @State private var tmdbLookupInProgress = false
     @State private var resolvedTmdbId: Int?
     @State private var showTmdbKeyAlert = false
+    @State private var isAnimating = false
 
     // 季下载状态
     private enum DownloadStatus {
@@ -174,9 +175,9 @@ struct MediaDetailView: View {
                 VStack(spacing: 20) {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.system(size: 62))
-                        .foregroundColor(.gray)
+                        .foregroundColor(ColorTokens.textMuted)
                     Text("加载详情失败")
-                        .font(.system(size: 26))
+                        .font(FontTokens.detailBody)
                 }
             }
         }
@@ -330,7 +331,7 @@ struct MediaDetailView: View {
                                 Text("返回")
                                     .font(.system(size: 20, weight: .regular))
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(ColorTokens.textPrimary)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
                             .background(Color.black.opacity(0.5))
@@ -368,15 +369,15 @@ struct MediaDetailView: View {
 
                             VStack(alignment: .leading, spacing: 12) {
                                 Text(detail.title)
-                                    .font(.system(size: 38, weight: .bold))
-                                    .foregroundColor(.white)
+                                    .font(FontTokens.heroTitle)
+                                    .foregroundColor(ColorTokens.textPrimary)
                                     .lineLimit(2)
                                     .frame(maxWidth: 380, alignment: .leading)
 
                                 if let originalTitle = detail.originalTitle, originalTitle != detail.title {
                                     Text(originalTitle)
                                         .font(.system(size: 24))
-                                        .foregroundColor(.white.opacity(0.7))
+                                        .foregroundColor(ColorTokens.textSecondary)
                                         .lineLimit(1)
                                         .frame(maxWidth: 380, alignment: .leading)
                                 }
@@ -396,11 +397,11 @@ struct MediaDetailView: View {
                                             Image(systemName: "magnifyingglass")
                                                 .font(.system(size: 22))
                                             Text("搜索资源")
-                                                .font(.system(size: 22, weight: .semibold))
+                                                .font(FontTokens.buttonText)
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
-                                        .background(Color.white.opacity(0.2))
+                                        .background(ColorTokens.divider)
                                         .cornerRadius(10)
                                     }
                                     .buttonStyle(ScaleFocusButtonStyle())
@@ -419,7 +420,7 @@ struct MediaDetailView: View {
                                                         .foregroundColor(viewModel.isSubscribed ? .red : .yellow)
                                                 }
                                                 Text(viewModel.isSubscribed ? "已订阅" : "订阅")
-                                                    .font(.system(size: 22, weight: .semibold))
+                                                    .font(FontTokens.buttonText)
                                                     .foregroundColor(viewModel.isSubscribed ? .red : .yellow)
                                             }
                                             .padding(.horizontal, 16)
@@ -463,7 +464,7 @@ struct MediaDetailView: View {
                                                     .font(.system(size: 22))
                                             }
                                             Text("Infuse播放")
-                                                .font(.system(size: 22, weight: .semibold))
+                                                .font(FontTokens.buttonText)
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
@@ -495,14 +496,14 @@ struct MediaDetailView: View {
                                                 .font(.system(size: 20))
                                                 .foregroundColor(.yellow)
                                             Text(String(format: "%.1f", rating))
-                                                .font(.system(size: 22, weight: .semibold))
+                                                .font(FontTokens.buttonText)
                                         }
                                     }
 
                                     if let year = detail.year {
                                         Text(year)
                                             .font(.system(size: 22))
-                                            .foregroundColor(.white.opacity(0.8))
+                                            .foregroundColor(ColorTokens.textPrimary.opacity(0.8))
                                     }
 
                                     if let type = detail.type {
@@ -531,17 +532,17 @@ struct MediaDetailView: View {
                                                 .padding(.vertical, 4)
                                                 .background(Color.purple.opacity(0.3))
                                                 .cornerRadius(5)
-                                                .foregroundColor(.white)
+                                                .foregroundColor(ColorTokens.textPrimary)
                                         }
                                     }
                                 }
-                                .foregroundColor(.white)
+                                .foregroundColor(ColorTokens.textPrimary)
 
                                 if let overview = detail.overview {
                                     Button(action: { isOverviewExpanded.toggle() }) {
                                         Text(overview)
-                                            .font(.system(size: 26))
-                                            .foregroundColor(.white.opacity(0.9))
+                                            .font(FontTokens.detailBody)
+                                            .foregroundColor(ColorTokens.textPrimary.opacity(0.9))
                                             .lineSpacing(6)
                                             .multilineTextAlignment(.leading)
                                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -582,8 +583,8 @@ struct MediaDetailView: View {
             if let cast = viewModel.credits?.cast, !cast.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("演员阵容")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
+                        .font(FontTokens.sectionTitle)
+                        .foregroundColor(ColorTokens.textPrimary)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 20) {
@@ -607,7 +608,7 @@ struct MediaDetailView: View {
                                                         .overlay(
                                                             Image(systemName: "person.fill")
                                                                 .font(.system(size: 40))
-                                                                .foregroundColor(.white.opacity(0.5))
+                                                                .foregroundColor(ColorTokens.textDim)
                                                         )
                                                 @unknown default:
                                                     Circle()
@@ -622,22 +623,22 @@ struct MediaDetailView: View {
                                                 .overlay(
                                                     Image(systemName: "person.fill")
                                                         .font(.system(size: 40))
-                                                        .foregroundColor(.white.opacity(0.5))
+                                                        .foregroundColor(ColorTokens.textDim)
                                                 )
                                         }
                                         
                                         // Name
                                         Text(member.name)
-                                            .font(.system(size: 18, weight: .semibold))
-                                            .foregroundColor(.white)
+                                            .font(FontTokens.castName)
+                                            .foregroundColor(ColorTokens.textPrimary)
                                             .lineLimit(1)
                                             .frame(width: 120)
                                         
                                         // Character
                                         if let character = member.character {
                                             Text(character)
-                                                .font(.system(size: 16))
-                                                .foregroundColor(.white.opacity(0.7))
+                                                .font(FontTokens.castCharacter)
+                                                .foregroundColor(ColorTokens.textSecondary)
                                                 .lineLimit(2)
                                                 .multilineTextAlignment(.center)
                                                 .frame(width: 120, height: 36)
@@ -656,8 +657,8 @@ struct MediaDetailView: View {
             else if let actors = detail.actors, !actors.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("演员")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.white)
+                        .font(FontTokens.settingsSectionTitle)
+                        .foregroundColor(ColorTokens.textPrimary)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 20) {
@@ -670,12 +671,12 @@ struct MediaDetailView: View {
                                             .overlay(
                                                 Image(systemName: "person.fill")
                                                     .font(.system(size: 40))
-                                                    .foregroundColor(.white.opacity(0.5))
+                                                    .foregroundColor(ColorTokens.textDim)
                                             )
                                         
                                         Text(actor)
-                                            .font(.system(size: 16))
-                                            .foregroundColor(.white)
+                                            .font(FontTokens.castCharacter)
+                                            .foregroundColor(ColorTokens.textPrimary)
                                             .lineLimit(2)
                                             .multilineTextAlignment(.center)
                                             .frame(width: 100)
@@ -704,7 +705,7 @@ struct MediaDetailView: View {
             }
         }
         .padding(60)
-        .background(Color.black)
+        .background(ColorTokens.appBackground)
         // 移除整体的 focusSection，让每个子区域独立管理焦点
     }
 
@@ -716,8 +717,8 @@ struct MediaDetailView: View {
         if !seasonCards.isEmpty {
             VStack(alignment: .leading, spacing: 14) {
                 Text("季")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(FontTokens.sectionTitle)
+                    .foregroundColor(ColorTokens.textPrimary)
                 
                 // 使用普通Grid而非LazyVGrid，确保立即渲染，让焦点系统能正确识别
                 Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 16) {
@@ -764,8 +765,8 @@ struct MediaDetailView: View {
         if !items.isEmpty {
             VStack(alignment: .leading, spacing: 14) {
                 Text("主创团队")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(FontTokens.sectionTitle)
+                    .foregroundColor(ColorTokens.textPrimary)
                 
                 // 使用普通Grid而非LazyVGrid，确保立即渲染
                 Grid(alignment: .leading, horizontalSpacing: 24, verticalSpacing: 18) {
@@ -778,11 +779,11 @@ struct MediaDetailView: View {
                                     Button(action: {}) {
                                         VStack(alignment: .leading, spacing: 6) {
                                             Text(item.role)
-                                                .font(.system(size: 18, weight: .semibold))
-                                                .foregroundColor(.white.opacity(0.9))
+                                                .font(FontTokens.castName)
+                                                .foregroundColor(ColorTokens.textPrimary.opacity(0.9))
                                             Text(item.name)
                                                 .font(.system(size: 20, weight: .semibold))
-                                                .foregroundColor(.white)
+                                                .foregroundColor(ColorTokens.textPrimary)
                                                 .lineLimit(1)
                                                 .multilineTextAlignment(.leading)
                                         }
@@ -806,75 +807,90 @@ struct MediaDetailView: View {
     @ViewBuilder
     private func loadingAnimationView() -> some View {
         ZStack {
-            // 渐变背景
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color.black,
-                    Color(white: 0.05)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            
-            VStack(spacing: 40) {
+            ColorTokens.appBackground.ignoresSafeArea()
+
+            VStack(spacing: 60) {
                 Spacer()
-                
-                // 优雅的加载指示器
-                VStack(spacing: 24) {
-                    // 旋转的加载环
-                    ZStack {
-                        // 背景环
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color.blue.opacity(0.1),
-                                        Color.blue.opacity(0.05)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 3
-                            )
-                            .frame(width: 80, height: 80)
-                        
-                        // 前景环（动画）
-                        Circle()
-                            .trim(from: 0, to: 0.7)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color.blue,
-                                        Color.cyan
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                            )
-                            .frame(width: 80, height: 80)
-                            .rotationEffect(.degrees(360))
-                            .animation(.linear(duration: 1.5).repeatForever(autoreverses: false), value: UUID())
+
+                // 海報 + 載入指示器
+                ZStack {
+                    if let url = media.posterURL {
+                        CachedAsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                            default:
+                                posterPlaceholder
+                            }
+                        }
+                        .frame(width: 360, height: 540)
+                        .cornerRadius(16)
+                        .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: 10)
+                    } else {
+                        posterPlaceholder
                     }
-                    
-                    // 加载文字
-                    VStack(spacing: 8) {
-                        Text("加载中...")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.white)
-                        
-                        Text("正在获取影片详情")
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundColor(.gray)
-                    }
+
+                    // 旋轉載入環
+                    Circle()
+                        .trim(from: 0, to: 0.7)
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [.blue, .cyan]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                        )
+                        .frame(width: 64, height: 64)
+                        .rotationEffect(.degrees(isAnimating ? 360 : 0))
+                        .animation(.linear(duration: 1.5).repeatForever(autoreverses: false), value: isAnimating)
+                        .onAppear { isAnimating = true }
+                        .shadow(color: .black.opacity(0.8), radius: 8)
                 }
-                
+
+                // 媒體資訊
+                VStack(spacing: 12) {
+                    Text(media.title)
+                        .font(FontTokens.heroTitle)
+                        .foregroundColor(ColorTokens.textPrimary)
+                        .multilineTextAlignment(.center)
+
+                    HStack(spacing: 12) {
+                        if let year = media.year {
+                            Text(year)
+                                .font(FontTokens.detailBody)
+                                .foregroundColor(ColorTokens.textSecondary)
+                        }
+                        if let type = media.type {
+                            Text(type)
+                                .font(FontTokens.detailBody)
+                                .foregroundColor(ColorTokens.textSecondary)
+                        }
+                    }
+
+                    Text("正在加载...")
+                        .font(FontTokens.caption)
+                        .foregroundColor(ColorTokens.textMuted)
+                        .padding(.top, 12)
+                }
+
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .background(Color.black)
+    }
+
+    private var posterPlaceholder: some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(ColorTokens.surfaceCard)
+            .frame(width: 360, height: 540)
+            .overlay(
+                Image(systemName: "film")
+                    .font(.system(size: 60))
+                    .foregroundColor(ColorTokens.textMuted)
+            )
     }
     
     // MARK: - 搜索进度对话框
@@ -882,7 +898,7 @@ struct MediaDetailView: View {
     private func searchProgressOverlay() -> some View {
         ZStack {
             // 半透明背景
-            Color.black.opacity(0.7)
+            ColorTokens.appBackground.opacity(0.7)
                 .ignoresSafeArea()
             
             // 进度卡片
@@ -890,12 +906,12 @@ struct MediaDetailView: View {
                 // 标题
                 Text("正在搜索资源")
                     .font(.system(size: 36, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(ColorTokens.textPrimary)
                 
                 // 进度环
                 ZStack {
                     Circle()
-                        .stroke(Color.white.opacity(0.2), lineWidth: 12)
+                        .stroke(ColorTokens.divider, lineWidth: 12)
                         .frame(width: 150, height: 150)
                     
                     Circle()
@@ -907,13 +923,13 @@ struct MediaDetailView: View {
                     
                     Text("\(Int(viewModel.searchProgress))%")
                         .font(.system(size: 34, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(ColorTokens.textPrimary)
                 }
                 
                 // 进度文本
                 Text(viewModel.searchProgressText)
                     .font(.system(size: 22))
-                    .foregroundColor(.white.opacity(0.9))
+                    .foregroundColor(ColorTokens.textPrimary.opacity(0.9))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 600)
                     .lineLimit(3)
@@ -930,7 +946,7 @@ struct MediaDetailView: View {
     @ViewBuilder
     private func downloadProgressOverlay() -> some View {
         ZStack {
-            Color.black.opacity(0.7)
+            ColorTokens.appBackground.opacity(0.7)
                 .ignoresSafeArea()
             
             VStack(spacing: 18) {
@@ -939,7 +955,7 @@ struct MediaDetailView: View {
                     .scaleEffect(1.4)
                 Text("正在提交下载请求…")
                     .font(.system(size: 24, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(ColorTokens.textPrimary)
             }
             .padding(50)
             .background(
@@ -957,13 +973,13 @@ struct MediaDetailView: View {
             // 标题栏
             HStack {
                 Text("搜索结果")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(FontTokens.sectionTitle)
+                    .foregroundColor(ColorTokens.textPrimary)
                 
                 Spacer()
                 Text("显示 \(viewModel.visibleSearchResults.count)/\(viewModel.searchResults.count) 个资源")
                     .font(.system(size: 20))
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(ColorTokens.textSecondary)
             }
             
             // 结果列表
@@ -1003,8 +1019,8 @@ struct MediaDetailView: View {
                     // 标题
                     if let title = torrent.title {
                         Text(title)
-                            .font(.system(size: 22, weight: .semibold))
-                            .foregroundColor(.white)
+                            .font(FontTokens.buttonText)
+                            .foregroundColor(ColorTokens.textPrimary)
                             .lineLimit(2)
                     }
                     
@@ -1018,7 +1034,7 @@ struct MediaDetailView: View {
                             .padding(.vertical, 6)
                             .background(Color.purple.opacity(0.3))
                             .cornerRadius(6)
-                            .foregroundColor(.white)
+                            .foregroundColor(ColorTokens.textPrimary)
                     }
                 }
                 
@@ -1028,7 +1044,7 @@ struct MediaDetailView: View {
                     Label {
                         Text(torrent.sizeText)
                             .font(.system(size: 18))
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(ColorTokens.textPrimary.opacity(0.8))
                 } icon: {
                     Image(systemName: "internaldrive")
                         .foregroundColor(.green)
@@ -1039,7 +1055,7 @@ struct MediaDetailView: View {
                     Label {
                         Text("\(seeders) 做种")
                             .font(.system(size: 18))
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(ColorTokens.textPrimary.opacity(0.8))
                     } icon: {
                         Image(systemName: "arrow.up.circle.fill")
                             .foregroundColor(.orange)
@@ -1050,7 +1066,7 @@ struct MediaDetailView: View {
                 Label {
                     Text(formatDate(torrent.pubdate))
                         .font(.system(size: 18))
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(ColorTokens.textPrimary.opacity(0.8))
                 } icon: {
                     Image(systemName: "clock")
                         .foregroundColor(.blue)
@@ -1069,7 +1085,7 @@ struct MediaDetailView: View {
                                 .padding(.vertical, 5)
                                 .background(tagBackground(for: tag.kind))
                                 .cornerRadius(5)
-                                .foregroundColor(.white)
+                                .foregroundColor(ColorTokens.textPrimary)
                         }
                     }
                 }
@@ -1432,8 +1448,8 @@ struct MediaDetailView: View {
                 // 顶部标题栏
                 HStack {
                     Text(season.name)
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
+                        .font(FontTokens.sectionTitle)
+                        .foregroundColor(ColorTokens.textPrimary)
                     
                     Spacer()
                     
@@ -1450,7 +1466,7 @@ struct MediaDetailView: View {
                                     .font(.system(size: 18))
                             }
                             Text(currentIsSubscribed ? "取消订阅" : "订阅")
-                                .font(.system(size: 18, weight: .semibold))
+                                .font(FontTokens.castName)
                         }
                         .frame(width: 160, height: 50)
                         .background(currentIsSubscribed ? Color.pink.opacity(0.9) : Color.purple.opacity(0.9))
@@ -1465,7 +1481,7 @@ struct MediaDetailView: View {
                 .padding(.bottom, 20)
                 
                 Divider()
-                    .background(Color.white.opacity(0.2))
+                    .background(ColorTokens.divider)
                 
                 // 剧集列表
                 if viewModel.isLoadingEpisodes {
@@ -1474,17 +1490,17 @@ struct MediaDetailView: View {
                             .scaleEffect(1.5)
                         Text("加载中...")
                             .font(.system(size: 20))
-                            .foregroundColor(.white.opacity(0.7))
+                            .foregroundColor(ColorTokens.textSecondary)
                     }
                     .frame(maxHeight: .infinity)
                 } else if viewModel.episodes.isEmpty {
                     VStack(spacing: 20) {
                         Image(systemName: "film")
                             .font(.system(size: 62))
-                            .foregroundColor(.gray)
+                            .foregroundColor(ColorTokens.textMuted)
                         Text("暂无剧集信息")
-                            .font(.system(size: 26))
-                            .foregroundColor(.gray)
+                            .font(FontTokens.detailBody)
+                            .foregroundColor(ColorTokens.textMuted)
                     }
                     .frame(maxHeight: .infinity)
                 } else {
@@ -1586,7 +1602,7 @@ struct MediaDetailView: View {
                                 .overlay(
                                     Image(systemName: "photo")
                                         .font(.system(size: 40))
-                                        .foregroundColor(.white.opacity(0.5))
+                                        .foregroundColor(ColorTokens.textDim)
                                 )
                         }
                     }
@@ -1598,7 +1614,7 @@ struct MediaDetailView: View {
                         .overlay(
                             Image(systemName: "photo")
                                 .font(.system(size: 40))
-                                .foregroundColor(.white.opacity(0.5))
+                                .foregroundColor(ColorTokens.textDim)
                         )
                 }
                 
@@ -1611,7 +1627,7 @@ struct MediaDetailView: View {
                         
                         Text(episode.name)
                             .font(.system(size: 24, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(ColorTokens.textPrimary)
                             .lineLimit(1)
                     }
                     
@@ -1624,13 +1640,13 @@ struct MediaDetailView: View {
                     if let overview = episode.overview, !overview.isEmpty {
                         Text(overview)
                             .font(.system(size: 20))
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(ColorTokens.textPrimary.opacity(0.8))
                             .lineLimit(nil)  // 改为不限制行数，聚焦时可以完整查看
                             .lineSpacing(4)
                     } else {
                         Text("暂无简介")
                             .font(.system(size: 20))
-                            .foregroundColor(.white.opacity(0.5))
+                            .foregroundColor(ColorTokens.textDim)
                             .italic()
                     }
                 }
@@ -1639,7 +1655,7 @@ struct MediaDetailView: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white.opacity(0.05))
+                    .fill(ColorTokens.surfaceCard)
             )
         }
         .buttonStyle(SoftFocusButtonStyle())  // 添加聚焦效果
@@ -1682,11 +1698,11 @@ struct MediaDetailView: View {
                 HStack(spacing: 32) {  // 进一步加大间距
                     Text(card.name)
                         .font(.system(size: 21, weight: .semibold))  // 加大一号
-                        .foregroundColor(.white)
+                        .foregroundColor(ColorTokens.textPrimary)
                         .lineLimit(1)
                     Text("\(card.episodeCount)集")
-                        .font(.system(size: 16))
-                        .foregroundColor(.white.opacity(0.8))
+                        .font(FontTokens.castCharacter)
+                        .foregroundColor(ColorTokens.textPrimary.opacity(0.8))
                 }
                 .frame(maxWidth: .infinity, alignment: .center)  // 居中
                 
@@ -1723,7 +1739,7 @@ struct MediaDetailView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white.opacity(0.05))
+                    .fill(ColorTokens.surfaceCard)
             )
         }
         .buttonStyle(SoftFocusButtonStyle())  // 改回使用 SoftFocusButtonStyle，它已经包含了焦点效果

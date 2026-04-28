@@ -15,14 +15,14 @@ struct CardButtonStyle: ButtonStyle {
             .padding(isFocused ? 4 : 0) // 留出缓冲，避免内部内容顶到边缘
             .background(Color.clear)
             .scaleEffect(isFocused ? 1.05 : 1.0)
-            .clipShape(RoundedRectangle(cornerRadius: 12)) // 聚焦后仍保持圆角，裁剪海报
-            .shadow(color: isFocused ? .white.opacity(0.35) : .clear, radius: 12)
-            .animation(.easeInOut(duration: 0.16), value: isFocused)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: isFocused ? ColorTokens.focusCardGlow : .clear, radius: 12)
+            .animation(.easeInOut(duration: 0.2), value: isFocused)
     }
 }
 
 extension ButtonStyle where Self == CardButtonStyle {
-    static var card: CardButtonStyle {
+    static var cardButton: CardButtonStyle {
         CardButtonStyle()
     }
 }

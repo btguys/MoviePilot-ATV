@@ -17,13 +17,13 @@ struct SitesView: View {
             // Header
             HStack(alignment: .center, spacing: 16) {
                 Text("站点")
-                    .font(.system(size: 40, weight: .bold))
-                    .foregroundColor(.white)
-                
+                    .font(FontTokens.pageTitle)
+                    .foregroundColor(ColorTokens.textPrimary)
+
                 if !viewModel.isLoading {
                     Text("共 \(viewModel.sites.count) 个站点")
-                        .font(.system(size: 18))
-                        .foregroundColor(.gray)
+                        .font(FontTokens.caption)
+                        .foregroundColor(ColorTokens.textMuted)
                 }
                 
                 Spacer()
@@ -32,33 +32,13 @@ struct SitesView: View {
             .padding(.vertical, 30)
             
             Divider()
-                .background(Color.white.opacity(0.2))
+                .background(ColorTokens.divider)
             
             // Content
             if viewModel.isLoading {
-                VStack {
-                    Spacer()
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(1.5)
-                    Text("加载中...")
-                        .font(.title3)
-                        .foregroundColor(.gray)
-                        .padding(.top, 20)
-                    Spacer()
-                }
+                LoadingView()
             } else if viewModel.sites.isEmpty {
-                VStack {
-                    Spacer()
-                    Image(systemName: "server.rack")
-                        .font(.system(size: 80))
-                        .foregroundColor(.gray)
-                    Text("暂无站点")
-                        .font(.title2)
-                        .foregroundColor(.gray)
-                        .padding(.top, 20)
-                    Spacer()
-                }
+                EmptyStateView(icon: "server.rack", title: "暂无站点")
             } else {
                 ScrollView {
                     LazyVGrid(
@@ -81,7 +61,7 @@ struct SitesView: View {
                 }
             }
         }
-        .background(Color.black)
+        .background(ColorTokens.appBackground)
         .onAppear {
             viewModel.loadSites()
         }
@@ -103,7 +83,7 @@ struct SiteCardView: View {
         cardContent
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.white.opacity(isFocused ? 0.12 : 0.05))
+                    .fill(isFocused ? ColorTokens.surfaceFocused : ColorTokens.surfaceCard)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
@@ -133,12 +113,12 @@ struct SiteCardView: View {
     private var siteIcon: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.blue.opacity(0.2))
+                .fill(ColorTokens.accent.opacity(0.2))
                 .frame(width: 64, height: 64)
             
             Text(String(site.name.prefix(1)))
                 .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.white)
+                .foregroundColor(ColorTokens.textPrimary)
         }
     }
     
@@ -146,12 +126,12 @@ struct SiteCardView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(site.name)
                 .font(.system(size: 22, weight: .semibold))
-                .foregroundColor(.white)
+                .foregroundColor(ColorTokens.textPrimary)
                 .lineLimit(1)
             
             Text(site.domain)
                 .font(.system(size: 14))
-                .foregroundColor(.gray)
+                .foregroundColor(ColorTokens.textMuted)
                 .lineLimit(1)
         }
     }
@@ -170,10 +150,10 @@ struct SiteCardView: View {
             HStack(spacing: 6) {
                 Image(systemName: "arrow.up.circle.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(.cyan)
+                    .foregroundColor(ColorTokens.info)
                 Text(userData?.uploadText ?? "0.00 B")
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.white)
+                    .foregroundColor(ColorTokens.textPrimary)
                     .frame(width: 90, alignment: .leading)
             }
             
@@ -186,10 +166,10 @@ struct SiteCardView: View {
             HStack(spacing: 6) {
                 Image(systemName: "arrow.down.circle.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(.orange)
+                    .foregroundColor(ColorTokens.warning)
                 Text(userData?.downloadText ?? "0.00 B")
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.white)
+                    .foregroundColor(ColorTokens.textPrimary)
                     .frame(width: 90, alignment: .leading)
             }
             
@@ -201,14 +181,14 @@ struct SiteCardView: View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 3)
-                    .fill(Color.white.opacity(0.1))
+                    .fill(ColorTokens.progressTrack)
                     .frame(height: 6)
                 
                 if let userData = userData, userData.upload > 0 || userData.download > 0 {
                     let total = Double(userData.upload) + Double(userData.download)
                     let uploadRatio = total > 0 ? Double(userData.upload) / total : 0
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.cyan)
+                        .fill(ColorTokens.info)
                         .frame(width: geometry.size.width * uploadRatio, height: 6)
                 }
             }
@@ -220,14 +200,14 @@ struct SiteCardView: View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 3)
-                    .fill(Color.white.opacity(0.1))
+                    .fill(ColorTokens.progressTrack)
                     .frame(height: 6)
                 
                 if let userData = userData, userData.upload > 0 || userData.download > 0 {
                     let total = Double(userData.upload) + Double(userData.download)
                     let downloadRatio = total > 0 ? Double(userData.download) / total : 0
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.orange)
+                        .fill(ColorTokens.warning)
                         .frame(width: geometry.size.width * downloadRatio, height: 6)
                 }
             }

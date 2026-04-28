@@ -89,7 +89,7 @@ struct HomeView: View {
                 Color.clear.frame(height: 60)
             }
             }
-            .background(Color.black)
+            .background(ColorTokens.appBackground)
             .zIndex(2)
             .navigationDestination(for: CategoryMoreDestination.self) { destination in
                 CategoryMoreView(source: destination.source, categoryTitle: destination.title)
@@ -247,8 +247,8 @@ struct FeaturedMediaCard: View {
             // Media Info
             VStack(alignment: .leading, spacing: 12) {
                 Text(media.title)
-                    .font(.system(size: 38, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(FontTokens.heroTitle)
+                    .foregroundColor(ColorTokens.textPrimary)
                 
                 HStack(spacing: 15) {
                     if let rating = media.voteAverage {
@@ -271,7 +271,7 @@ struct FeaturedMediaCard: View {
                             .font(.system(size: 14))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(Color.blue.opacity(0.8))
+                            .background(ColorTokens.accent.opacity(0.8))
                             .cornerRadius(4)
                     }
                 }
@@ -279,8 +279,8 @@ struct FeaturedMediaCard: View {
                 
                 if let overview = media.overview {
                     Text(overview)
-                        .font(.system(size: 24))
-                        .foregroundColor(.white.opacity(0.9))
+                        .font(FontTokens.detailBody)
+                        .foregroundColor(ColorTokens.textPrimary.opacity(0.9))
                         .lineLimit(3)
                         .frame(maxWidth: 700, alignment: .leading)
                 }
@@ -321,14 +321,12 @@ struct MediaSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text(title)
-                .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.white)
-            
+                .font(FontTokens.sectionTitle)
+                .foregroundColor(ColorTokens.textPrimary)
+
             if isLoading {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                LoadingView()
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 40)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: 26) {
@@ -371,7 +369,7 @@ struct MediaCard: View {
             // Poster
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white.opacity(0.05))
+                    .fill(ColorTokens.surfaceCard)
                 if let posterURL = media.posterURL {
                     CachedAsyncImage(url: posterURL) { phase in
                         switch phase {
@@ -425,16 +423,16 @@ struct MediaCard: View {
             
             // Title
             Text(media.title)
-                .font(.system(size: 19, weight: .medium))
-                .foregroundColor(.white)
+                .font(FontTokens.cardTitle)
+                .foregroundColor(ColorTokens.textPrimary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
-            
+
             // Year
             if let year = media.year {
                 Text(String(year))
-                    .font(.system(size: 15))
-                    .foregroundColor(.gray)
+                    .font(FontTokens.cardSubtitle)
+                    .foregroundColor(ColorTokens.textMuted)
                     .multilineTextAlignment(.center)
             }
         }
@@ -448,8 +446,8 @@ struct SubscriptionSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text(title)
-                .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.white)
+                .font(FontTokens.sectionTitle)
+                .foregroundColor(ColorTokens.textPrimary)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 26) {

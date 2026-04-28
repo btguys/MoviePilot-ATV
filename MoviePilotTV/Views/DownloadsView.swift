@@ -17,12 +17,12 @@ struct DownloadsView: View {
             // Header
             HStack(alignment: .center, spacing: 16) {
                 Text("下载管理")
-                    .font(.system(size: 40, weight: .bold))
-                    .foregroundColor(.white)
-                
+                    .font(FontTokens.pageTitle)
+                    .foregroundColor(ColorTokens.textPrimary)
+
                 Text("共 \(totalTaskCount) 个任务")
-                    .font(.system(size: 18))
-                    .foregroundColor(.gray)
+                    .font(FontTokens.caption)
+                    .foregroundColor(ColorTokens.textMuted)
                 
                 Spacer()
             }
@@ -30,33 +30,13 @@ struct DownloadsView: View {
             .padding(.vertical, 30)
             
             Divider()
-                .background(Color.white.opacity(0.2))
+                .background(ColorTokens.divider)
             
             // Content
             if viewModel.isLoading {
-                VStack {
-                    Spacer()
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(1.5)
-                    Text("正在加载下载器...")
-                        .font(.system(size: 16))
-                        .foregroundColor(.gray)
-                        .padding(.top, 20)
-                    Spacer()
-                }
+                LoadingView("正在加载下载器...")
             } else if viewModel.downloaderSections.isEmpty {
-                VStack {
-                    Spacer()
-                    Image(systemName: "arrow.down.circle")
-                        .font(.system(size: 80))
-                        .foregroundColor(.gray)
-                    Text("暂无下载器")
-                        .font(.title2)
-                        .foregroundColor(.gray)
-                        .padding(.top, 20)
-                    Spacer()
-                }
+                EmptyStateView(icon: "arrow.down.circle", title: "暂无下载器")
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 40) {
@@ -78,7 +58,7 @@ struct DownloadsView: View {
                 }
             }
         }
-        .background(Color.black)
+        .background(ColorTokens.appBackground)
         .onAppear {
             viewModel.loadDownloaders()
             viewModel.startPolling()
@@ -131,16 +111,16 @@ struct DownloaderSectionView: View {
             HStack(spacing: 12) {
                 Image(systemName: "arrow.down.circle.fill")
                     .font(.system(size: 20))
-                    .foregroundColor(.blue)
+                    .foregroundColor(ColorTokens.accent)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(section.client.name)
                         .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(ColorTokens.textPrimary)
                     
                     Text("\(section.tasks.count) 个任务 • \(section.client.type)")
                         .font(.system(size: 14))
-                        .foregroundColor(.gray)
+                        .foregroundColor(ColorTokens.textMuted)
                 }
                 
                 Spacer()
@@ -152,16 +132,16 @@ struct DownloaderSectionView: View {
                     Spacer()
                     Image(systemName: "checkmark.circle")
                         .font(.system(size: 40))
-                        .foregroundColor(.gray)
+                        .foregroundColor(ColorTokens.textMuted)
                     Text("暂无任务")
                         .font(.system(size: 16))
-                        .foregroundColor(.gray)
+                        .foregroundColor(ColorTokens.textMuted)
                         .padding(.top, 10)
                     Spacer()
                 }
                 .frame(height: 200)
                 .frame(maxWidth: .infinity)
-                .background(Color.white.opacity(0.03))
+                .background(ColorTokens.surfaceCard.opacity(0.6))
                 .cornerRadius(12)
             } else {
                 let columns = [
@@ -198,7 +178,7 @@ struct DownloadTaskCard: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(task.displayTitle)
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(ColorTokens.textPrimary)
                             .lineLimit(2)
                         
                         HStack(spacing: 12) {
@@ -206,7 +186,7 @@ struct DownloadTaskCard: View {
                             
                             Text(task.displayState)
                                 .font(.system(size: 12))
-                                .foregroundColor(.gray)
+                                .foregroundColor(ColorTokens.textMuted)
                         }
                     }
                     
@@ -216,11 +196,11 @@ struct DownloadTaskCard: View {
                     VStack(alignment: .trailing, spacing: 4) {
                         Text(String(format: "%.1f%%", task.displayProgress))
                             .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(.blue)
+                            .foregroundColor(ColorTokens.accent)
                         
                         Text(task.displaySize)
                             .font(.system(size: 12))
-                            .foregroundColor(.gray)
+                            .foregroundColor(ColorTokens.textMuted)
                     }
                 }
                 
@@ -228,7 +208,7 @@ struct DownloadTaskCard: View {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.white.opacity(0.1))
+                            .fill(ColorTokens.progressTrack)
                         
                         RoundedRectangle(cornerRadius: 4)
                             .fill(
@@ -251,7 +231,7 @@ struct DownloadTaskCard: View {
                         Text(task.dlspeed ?? "0.0B")
                             .font(.system(size: 12))
                     }
-                    .foregroundColor(.gray)
+                    .foregroundColor(ColorTokens.textMuted)
                     
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.up")
@@ -259,7 +239,7 @@ struct DownloadTaskCard: View {
                         Text(task.upspeed ?? "0.0B")
                             .font(.system(size: 12))
                     }
-                    .foregroundColor(.gray)
+                    .foregroundColor(ColorTokens.textMuted)
                     
                     if !task.left_time.isNilOrEmpty {
                         HStack(spacing: 6) {
@@ -268,14 +248,14 @@ struct DownloadTaskCard: View {
                             Text(task.left_time ?? "-")
                                 .font(.system(size: 12))
                         }
-                        .foregroundColor(.gray)
+                        .foregroundColor(ColorTokens.textMuted)
                     }
                     
                     Spacer()
                 }
             }
             .padding(16)
-            .background(Color.white.opacity(0.05))
+            .background(ColorTokens.surfaceCard)
             .cornerRadius(12)
             .contentShape(Rectangle())
             .scaleEffect(isFocused ? 1.05 : 1.0)
@@ -300,17 +280,17 @@ struct StateIndicator: View {
     var color: Color {
         switch state?.lowercased() {
         case "paused":
-            return .orange
+            return ColorTokens.warning
         case "downloading":
-            return .blue
+            return ColorTokens.accent
         case "completed":
-            return .green
+            return ColorTokens.success
         case "error":
-            return .red
+            return ColorTokens.danger
         case "seeding":
-            return .cyan
+            return ColorTokens.info
         default:
-            return .gray
+            return ColorTokens.textMuted
         }
     }
     

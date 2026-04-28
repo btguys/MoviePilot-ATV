@@ -35,15 +35,15 @@ struct LoginView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 140, height: 140)
-                        .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 6)
+                        .shadow(color: ColorTokens.appBackground.opacity(0.3), radius: 10, x: 0, y: 6)
                     
                     Text("Movie Pilot for ATV")
                         .font(.system(size: 48, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(ColorTokens.textPrimary)
                     
                     Text("影音订阅管理平台")
                         .font(.title3)
-                        .foregroundColor(.gray)
+                        .foregroundColor(ColorTokens.textMuted)
                 }
                 
                 // Login Form
@@ -86,19 +86,19 @@ struct LoginView: View {
                             Text("登录")
                                 .font(.title2)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.white)
+                                .foregroundColor(ColorTokens.textPrimary)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 60)
                         }
                     }
-                    .background(isFormValid ? Color.blue : Color.gray)
+                    .background(isFormValid ? ColorTokens.accent : ColorTokens.textMuted)
                     .cornerRadius(10)
                     .disabled(!isFormValid || isLoading)
                     
                 }
                 .frame(width: 700)
                 .padding(40)
-                .background(Color.white.opacity(0.1))
+                .background(ColorTokens.surfaceFocused)
                 .cornerRadius(20)
             }
         }
@@ -119,10 +119,10 @@ struct LoginView: View {
             if showTokenExpiredBanner {
                 Text(tokenExpiredBannerMessage.isEmpty ? "登录已过期，请重新登录" : tokenExpiredBannerMessage)
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(ColorTokens.textPrimary)
                     .padding(.vertical, 12)
                     .padding(.horizontal, 20)
-                    .background(Color.red.opacity(0.9))
+                    .background(ColorTokens.danger.opacity(0.9))
                     .cornerRadius(12)
                     .padding(.top, 40)
                     .padding(.horizontal, 24)
@@ -211,7 +211,7 @@ struct TVInputField: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(ColorTokens.textPrimary)
             
             Button(action: {
                 showInput = true
@@ -220,29 +220,29 @@ struct TVInputField: View {
                     if isSecure && !text.isEmpty {
                         Text(String(repeating: "•", count: text.count))
                             .font(.title3)
-                            .foregroundColor(.white)
+                            .foregroundColor(ColorTokens.textPrimary)
                     } else if !text.isEmpty {
                         Text(text)
                             .font(.title3)
-                            .foregroundColor(.white)
+                            .foregroundColor(ColorTokens.textPrimary)
                     } else {
                         Text(placeholder)
                             .font(.title3)
-                            .foregroundColor(.gray)
+                            .foregroundColor(ColorTokens.textMuted)
                     }
                     
                     Spacer()
                     
                     Image(systemName: "pencil")
-                        .foregroundColor(.gray)
+                        .foregroundColor(ColorTokens.textMuted)
                 }
                 .padding()
                 .frame(height: 60)
-                .background(Color.white.opacity(0.08))
+                .background(ColorTokens.surfaceHover)
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(isFocused ? Color.white.opacity(0.12) : Color.clear, lineWidth: 1)
+                        .stroke(isFocused ? ColorTokens.surfaceFocused : Color.clear, lineWidth: 1)
                 )
             }
             .buttonStyle(PlainButtonStyle())
@@ -268,9 +268,9 @@ struct CustomTextFieldStyle: TextFieldStyle {
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .padding()
-            .background(Color.white.opacity(0.1))
+            .background(ColorTokens.surfaceFocused)
             .cornerRadius(10)
-            .foregroundColor(.white)
+            .foregroundColor(ColorTokens.textPrimary)
             .font(.title3)
     }
 }

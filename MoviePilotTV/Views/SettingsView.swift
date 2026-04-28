@@ -8,87 +8,89 @@ struct SettingsView: View {
     @State private var tmdbApiKey: String = ""
     @State private var isEditingTmdbKey = false
     @FocusState private var isTmdbKeyFocused: Bool
-    
+    @FocusState private var isHomeStatusMenuFocused: Bool
+    @FocusState private var isLogoutButtonFocused: Bool
+
     var body: some View {
         ScrollView {
             VStack(spacing: 40) {
                 Text("设置")
-                    .font(.system(size: 48, weight: .bold))
+                    .font(FontTokens.pageTitle)
                     .padding(.top, 60)
-                
+
                 // 用户信息区域
                 VStack(alignment: .leading, spacing: 20) {
                     Text("用户信息")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.white)
-                    
+                        .font(FontTokens.settingsSectionTitle)
+                        .foregroundColor(ColorTokens.textPrimary)
+
                     if isLoading {
                         HStack {
                             ProgressView()
                             Text("加载中...")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(ColorTokens.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(30)
-                        .background(Color.white.opacity(0.05))
+                        .background(ColorTokens.surfaceCard)
                         .cornerRadius(12)
                     } else if let user = userInfo {
                         HStack(spacing: 30) {
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 80))
-                                .foregroundColor(.blue)
-                            
+                                .foregroundColor(ColorTokens.accent)
+
                             VStack(alignment: .leading, spacing: 12) {
                                 Text(user.name)
                                     .font(.system(size: 26, weight: .semibold))
-                                    .foregroundColor(.white)
+                                    .foregroundColor(ColorTokens.textPrimary)
                                 Text(user.email ?? "无邮箱信息")
                                     .font(.system(size: 20))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(ColorTokens.textSecondary)
                             }
                             Spacer()
                         }
                         .padding(30)
-                        .background(Color.white.opacity(0.05))
+                        .background(ColorTokens.surfaceCard)
                         .cornerRadius(12)
                     } else {
                         Text("无法获取用户信息")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(ColorTokens.textSecondary)
                             .frame(maxWidth: .infinity)
                             .padding(30)
-                            .background(Color.white.opacity(0.05))
+                            .background(ColorTokens.surfaceCard)
                             .cornerRadius(12)
                     }
                 }
                 .padding(.horizontal, 80)
-                
+
                 // 服务器信息区域
                 VStack(alignment: .leading, spacing: 20) {
                     Text("服务器信息")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.white)
-                    
+                        .font(FontTokens.settingsSectionTitle)
+                        .foregroundColor(ColorTokens.textPrimary)
+
                     VStack(spacing: 16) {
                         // API 地址
                         HStack {
                             Text("API 地址")
-                                .font(.system(size: 20))
-                                .foregroundColor(.white)
+                                .font(FontTokens.settingsValue)
+                                .foregroundColor(ColorTokens.textPrimary)
                             Spacer()
                             Text(authManager.apiEndpoint)
                                 .font(.system(size: 18))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(ColorTokens.textSecondary)
                         }
                         .padding(24)
-                        .background(Color.white.opacity(0.05))
+                        .background(ColorTokens.surfaceCard)
                         .cornerRadius(12)
-                        
+
                         // TMDB API KEY
                         VStack(alignment: .leading, spacing: 16) {
                             HStack {
                                 Text("TMDB API KEY")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.white)
+                                    .font(FontTokens.settingsValue)
+                                    .foregroundColor(ColorTokens.textPrimary)
                                 Spacer()
                                 if !isEditingTmdbKey {
                                     Button(action: {
@@ -101,8 +103,8 @@ struct SettingsView: View {
                                             Image(systemName: tmdbApiKey.isEmpty ? "exclamationmark.circle" : "checkmark.circle.fill")
                                             Text(tmdbApiKey.isEmpty ? "未设置" : "已设置")
                                         }
-                                        .font(.system(size: 18, weight: .semibold))
-                                        .foregroundColor(tmdbApiKey.isEmpty ? .orange : .green)
+                                        .font(FontTokens.buttonSmall)
+                                        .foregroundColor(tmdbApiKey.isEmpty ? ColorTokens.warning : ColorTokens.success)
                                         .padding(.horizontal, 20)
                                         .padding(.vertical, 10)
                                         .background(Color.white.opacity(0.1))
@@ -110,79 +112,137 @@ struct SettingsView: View {
                                     }
                                 }
                             }
-                            
+                            Text("用于豆瓣来源的影片自动查询 TMDB ID，以支持 Infuse 跳转播放。")
+                                .font(FontTokens.caption)
+                                .foregroundColor(ColorTokens.textSecondary)
+
                             if isEditingTmdbKey {
                                 VStack(spacing: 16) {
                                     TextField("请输入 TMDB API KEY", text: $tmdbApiKey)
-                                        .textFieldStyle(.roundedBorder)
                                         .font(.system(size: 18))
                                         .focused($isTmdbKeyFocused)
+                                        .padding(12)
+                                        .background(ColorTokens.surfaceHover)
+                                        .cornerRadius(10)
                                         .onSubmit {
                                             saveTmdbApiKey()
                                         }
-                                    
+
                                     HStack(spacing: 16) {
                                         Button(action: {
                                             saveTmdbApiKey()
                                         }) {
                                             Text("保存")
-                                                .font(.system(size: 18, weight: .semibold))
-                                                .foregroundColor(.white)
+                                                .font(FontTokens.buttonSmall)
+                                                .foregroundColor(ColorTokens.textPrimary)
                                                 .frame(width: 140, height: 50)
-                                                .background(Color.blue)
+                                                .background(ColorTokens.accent)
                                                 .cornerRadius(10)
                                         }
-                                        
+
                                         Button(action: {
                                             tmdbApiKey = authManager.tmdbApiKey
                                             isEditingTmdbKey = false
                                         }) {
                                             Text("取消")
-                                                .font(.system(size: 18, weight: .semibold))
-                                                .foregroundColor(.white)
+                                                .font(FontTokens.buttonSmall)
+                                                .foregroundColor(ColorTokens.textPrimary)
                                                 .frame(width: 140, height: 50)
                                                 .background(Color.gray.opacity(0.6))
                                                 .cornerRadius(10)
                                         }
-                                        
+
                                         Spacer()
                                     }
                                 }
                             }
                         }
                         .padding(24)
-                        .background(Color.white.opacity(0.05))
+                        .background(ColorTokens.surfaceCard)
                         .cornerRadius(12)
                     }
                 }
                 .padding(.horizontal, 80)
-                
+
+                // 显示设置
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("显示设置")
+                        .font(FontTokens.settingsSectionTitle)
+                        .foregroundColor(ColorTokens.textPrimary)
+
+                    VStack(spacing: 16) {
+                        HStack {
+                            Text("首页系统状态栏")
+                                .font(FontTokens.settingsValue)
+                                .foregroundColor(ColorTokens.textPrimary)
+                            Spacer()
+                            Menu {
+                                ForEach(HomeSystemStatusMode.allCases, id: \.self) { mode in
+                                    Button(action: { authManager.saveHomeSystemStatusMode(mode) }) {
+                                        HStack(spacing: 8) {
+                                            Text(mode.displayName)
+                                            if authManager.homeSystemStatusMode == mode {
+                                                Image(systemName: "checkmark")
+                                            }
+                                        }
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Text(authManager.homeSystemStatusMode.displayName)
+                                        .font(FontTokens.settingsValue)
+                                        .foregroundColor(ColorTokens.textPrimary)
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(ColorTokens.textPrimary)
+                                }
+                                .padding(12)
+                                .background(ColorTokens.surfaceCard)
+                                .cornerRadius(12)
+                            }
+                            .focused($isHomeStatusMenuFocused)
+                            .onMoveCommand { direction in
+                                if direction == .down {
+                                    isLogoutButtonFocused = true
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 80)
+                .padding(.top, 20)
+
                 // 退出登录按钮
                 Button(action: {
                     showLogoutAlert = true
                 }) {
                     HStack(spacing: 12) {
                         Image(systemName: "rectangle.portrait.and.arrow.right")
-                            .font(.system(size: 20))
+                            .font(FontTokens.settingsValue)
                         Text("退出登录")
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(FontTokens.buttonText)
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(ColorTokens.textPrimary)
                     .frame(width: 300, height: 60)
-                    .background(Color.red.opacity(0.8))
+                    .background(ColorTokens.danger.opacity(0.8))
                     .cornerRadius(12)
+                }
+                .focused($isLogoutButtonFocused)
+                .onMoveCommand { direction in
+                    if direction == .up {
+                        isHomeStatusMenuFocused = true
+                    }
                 }
                 .padding(.top, 20)
                 .padding(.bottom, 60)
             }
         }
-        .background(Color.black)
+        .background(ColorTokens.appBackground)
         .task {
             await loadUserInfo()
             tmdbApiKey = authManager.tmdbApiKey
         }
     }
-    
+
     private func loadUserInfo() async {
         isLoading = true
         defer { isLoading = false }
@@ -192,7 +252,7 @@ struct SettingsView: View {
             print("加载用户信息失败: \(error)")
         }
     }
-    
+
     private func saveTmdbApiKey() {
         authManager.saveTmdbApiKey(tmdbApiKey)
         isEditingTmdbKey = false

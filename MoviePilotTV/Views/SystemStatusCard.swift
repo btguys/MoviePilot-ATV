@@ -23,15 +23,15 @@ struct SystemStatusCard: View {
                     // 更新时间指示器
                     Image(systemName: viewModel.isLoading ? "arrow.2.circlepath" : "checkmark.circle.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(.green)
+                        .foregroundColor(ColorTokens.success)
                         .scaleEffect(viewModel.isLoading ? 1.1 : 1.0)
                         .opacity(viewModel.isLoading ? 1.0 : 0.9)
                         .animation(viewModel.isLoading ? Animation.easeInOut(duration: 0.7).repeatForever(autoreverses: true) : .easeInOut(duration: 0.2), value: viewModel.isLoading)
                 }
-                .foregroundColor(.white)
+                .foregroundColor(ColorTokens.textPrimary)
                 
                 Divider()
-                    .background(Color.white.opacity(0.2))
+                    .background(ColorTokens.divider)
                 
                 // 存储空间
                 if let storageInfo = status.storageInfo {
@@ -39,20 +39,20 @@ struct SystemStatusCard: View {
                         HStack {
                             Image(systemName: "internaldrive.fill")
                                 .font(.system(size: 16))
-                                .foregroundColor(.blue)
+                                .foregroundColor(ColorTokens.accent)
                             Text("存储空间")
                                 .font(.system(size: 16, weight: .medium))
                             Spacer()
                             Text("\(String(format: "%.1f", storageInfo.usagePercentage))%")
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(.orange)
+                                .font(FontTokens.systemValue)
+                                .foregroundColor(ColorTokens.warning)
                         }
                         
                         // 进度条
                         GeometryReader { geometry in
                             ZStack(alignment: .leading) {
                                 RoundedRectangle(cornerRadius: 3)
-                                    .fill(Color.white.opacity(0.1))
+                                    .fill(ColorTokens.progressTrack)
                                 
                                 RoundedRectangle(cornerRadius: 3)
                                     .fill(
@@ -70,33 +70,33 @@ struct SystemStatusCard: View {
                         HStack(spacing: 16) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("已用")
-                                    .font(.system(size: 12, weight: .regular))
-                                    .foregroundColor(.white.opacity(0.6))
+                                    .font(FontTokens.systemLabel)
+                                    .foregroundColor(ColorTokens.textDim)
                                 Text(storageInfo.usedStorageText)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(.white)
+                                    .font(FontTokens.systemValue)
+                                    .foregroundColor(ColorTokens.textPrimary)
                             }
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("总计")
-                                    .font(.system(size: 12, weight: .regular))
-                                    .foregroundColor(.white.opacity(0.6))
+                                    .font(FontTokens.systemLabel)
+                                    .foregroundColor(ColorTokens.textDim)
                                 Text(storageInfo.totalStorageText)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(.white)
+                                    .font(FontTokens.systemValue)
+                                    .foregroundColor(ColorTokens.textPrimary)
                             }
                             
                             Spacer()
                             
                             VStack(alignment: .trailing, spacing: 2) {
                                 Text("磁盘剩余")
-                                    .font(.system(size: 12, weight: .regular))
-                                    .foregroundColor(.white.opacity(0.6))
+                                    .font(FontTokens.systemLabel)
+                                    .foregroundColor(ColorTokens.textDim)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                                 Text(storageInfo.freeStorageText)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(.green)
+                                    .font(FontTokens.systemValue)
+                                    .foregroundColor(ColorTokens.success)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                             }
@@ -105,7 +105,7 @@ struct SystemStatusCard: View {
                 }
                 
                 Divider()
-                    .background(Color.white.opacity(0.2))
+                    .background(ColorTokens.divider)
                 
                 // 下载速度
                 if let downloaderInfo = status.downloaderInfo {
@@ -116,10 +116,10 @@ struct SystemStatusCard: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "arrow.down.circle.fill")
                                     .font(.system(size: 16))
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(ColorTokens.accent)
                                 Text(downloaderInfo.downloadSpeedText)
                                     .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(ColorTokens.accent)
                             }
                             .frame(maxWidth: .infinity, alignment: .center)
                             
@@ -127,10 +127,10 @@ struct SystemStatusCard: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "arrow.up.circle.fill")
                                     .font(.system(size: 16))
-                                    .foregroundColor(.orange)
+                                    .foregroundColor(ColorTokens.warning)
                                 Text(downloaderInfo.uploadSpeedText)
                                     .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(.orange)
+                                    .foregroundColor(ColorTokens.warning)
                             }
                             .frame(maxWidth: .infinity, alignment: .center)
                         }
@@ -139,13 +139,13 @@ struct SystemStatusCard: View {
                         HStack(spacing: 0) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("总下载")
-                                    .font(.system(size: 12, weight: .regular))
-                                    .foregroundColor(.white.opacity(0.6))
+                                    .font(FontTokens.systemLabel)
+                                    .foregroundColor(ColorTokens.textDim)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                                 Text(downloaderInfo.downloadSizeText)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(.cyan)
+                                    .font(FontTokens.systemValue)
+                                    .foregroundColor(ColorTokens.info)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                             }
@@ -153,13 +153,13 @@ struct SystemStatusCard: View {
                             
                             VStack(alignment: .center, spacing: 4) {
                                 Text("总上传")
-                                    .font(.system(size: 12, weight: .regular))
-                                    .foregroundColor(.white.opacity(0.6))
+                                    .font(FontTokens.systemLabel)
+                                    .foregroundColor(ColorTokens.textDim)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                                 Text(downloaderInfo.uploadSizeText)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(.orange)
+                                    .font(FontTokens.systemValue)
+                                    .foregroundColor(ColorTokens.warning)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                             }
@@ -167,13 +167,13 @@ struct SystemStatusCard: View {
                             
                             VStack(alignment: .trailing, spacing: 4) {
                                 Text("磁盘剩余")
-                                    .font(.system(size: 12, weight: .regular))
-                                    .foregroundColor(.white.opacity(0.6))
+                                    .font(FontTokens.systemLabel)
+                                    .foregroundColor(ColorTokens.textDim)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                                 Text(downloaderInfo.freeSpaceText)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(.green)
+                                    .font(FontTokens.systemValue)
+                                    .foregroundColor(ColorTokens.success)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.9)
                             }
@@ -182,14 +182,14 @@ struct SystemStatusCard: View {
                     }
                 }
             }
-            .foregroundColor(.white)
+            .foregroundColor(ColorTokens.textPrimary)
             .padding(16)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.black.opacity(0.85))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                                .stroke(ColorTokens.progressTrack, lineWidth: 1)
                         )
                 )
         }
@@ -207,7 +207,7 @@ struct CompactSystemStatusCard: View {
                 HStack(spacing: 12) {
                     Image(systemName: "internaldrive.fill")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.blue)
+                        .foregroundColor(ColorTokens.accent)
                         .frame(width: 28)
 
                     GeometryReader { geo in
@@ -226,8 +226,8 @@ struct CompactSystemStatusCard: View {
 
                     if let storage = status.storageInfo {
                         Text(storage.totalStorageText)
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.9))
+                            .font(FontTokens.systemValue)
+                            .foregroundColor(ColorTokens.textPrimary.opacity(0.9))
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
                     }
@@ -239,10 +239,10 @@ struct CompactSystemStatusCard: View {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.down.circle.fill")
                             .font(.system(size: 18))
-                            .foregroundColor(.blue)
+                            .foregroundColor(ColorTokens.accent)
                         Text(status.downloaderInfo?.downloadSpeedText ?? "0.0 B/s")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(ColorTokens.accent)
+                            .font(FontTokens.systemValue)
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
                     }
@@ -250,13 +250,13 @@ struct CompactSystemStatusCard: View {
 
                     HStack(spacing: 8) {
                         Text(status.downloaderInfo?.uploadSpeedText ?? "0.0 B/s")
-                            .foregroundColor(.orange)
-                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(ColorTokens.warning)
+                            .font(FontTokens.systemValue)
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
                         Image(systemName: "arrow.up.circle.fill")
                             .font(.system(size: 18))
-                            .foregroundColor(.orange)
+                            .foregroundColor(ColorTokens.warning)
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                 }

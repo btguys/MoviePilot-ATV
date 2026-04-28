@@ -16,47 +16,26 @@ struct RecommendView: View {
                 // Header
                 VStack(spacing: 12) {
                     Text("推荐榜单")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
-                    
+                        .font(FontTokens.pageTitle)
+                        .foregroundColor(ColorTokens.textPrimary)
+
                     Text("来自 TMDB 和豆瓣的精选内容")
-                        .font(.system(size: 16))
-                        .foregroundColor(.gray)
+                        .font(FontTokens.caption)
+                        .foregroundColor(ColorTokens.textMuted)
                 }
                 .padding(.vertical, 25)
                 .padding(.horizontal, 90)
                 
                 Divider()
-                    .background(Color.white.opacity(0.2))
+                    .background(ColorTokens.divider)
                     .padding(.horizontal, 90)
-                
+
                 // Content
                 if viewModel.isLoading {
-                    VStack {
-                        Spacer()
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(1.5)
-                        Text("正在加载推荐内容...")
-                            .font(.system(size: 16))
-                            .foregroundColor(.gray)
-                            .padding(.top, 20)
-                        Spacer()
-                    }
-                    .frame(height: 400)
+                    LoadingView("正在加载推荐内容...")
+                        .frame(height: 400)
                 } else if viewModel.sections.isEmpty {
-                    VStack {
-                        Spacer()
-                        Image(systemName: "star.slash")
-                            .font(.system(size: 60))
-                            .foregroundColor(.gray)
-                        Text("暂无推荐内容")
-                            .font(.system(size: 20))
-                        .foregroundColor(.gray)
-                        .padding(.top, 15)
-                        Spacer()
-                    }
-                    .frame(height: 400)
+                    EmptyStateView(icon: "star.slash", title: "暂无推荐内容")
                 } else {
                     VStack(alignment: .leading, spacing: 40) {
                         ForEach(viewModel.sections) { section in
@@ -71,7 +50,7 @@ struct RecommendView: View {
                 }
             }
         }
-        .background(Color.black)
+        .background(ColorTokens.appBackground)
         .navigationDestination(for: MediaItem.self) { media in
             MediaDetailView(media: media)
         }
@@ -117,8 +96,8 @@ struct RecommendSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text(section.title)
-                .font(.system(size: 26, weight: .bold))
-                .foregroundColor(.white)
+                .font(FontTokens.sectionTitle)
+                .foregroundColor(ColorTokens.textPrimary)
                 .padding(.leading, 30)
             
             // 使用 LazyHStack 而不是 ScrollView 来改善焦点行为
@@ -129,7 +108,7 @@ struct RecommendSectionView: View {
                             MediaCard(media: item)
                                 .frame(width: 220)
                         }
-                        .buttonStyle(.card)
+                        .buttonStyle(.cardButton)
                     }
                     
                     // 更多卡片
@@ -137,7 +116,7 @@ struct RecommendSectionView: View {
                         MoreCard()
                             .frame(width: 220)
                     }
-                    .buttonStyle(.card)
+                    .buttonStyle(.cardButton)
                 }
                 .padding(.vertical, 20) // 放大时留出更多上下空间，避免裁切
                 .padding(.horizontal, 30)

@@ -17,14 +17,14 @@ struct SearchView: View {
                 // Search Header
                 VStack(spacing: 18) {
                     Text("搜索影片")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
+                        .font(FontTokens.pageTitle)
+                        .foregroundColor(ColorTokens.textPrimary)
                     
                     // Search Bar
                     HStack(spacing: 12) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 20))
-                            .foregroundColor(.gray)
+                            .foregroundColor(ColorTokens.textMuted)
                         
                         TextField("输入电影或电视剧名称", text: $viewModel.searchQuery)
                             .textFieldStyle(PlainTextFieldStyle())
@@ -42,13 +42,13 @@ struct SearchView: View {
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .font(.system(size: 20))
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(ColorTokens.textMuted)
                             }
                         }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color.white.opacity(0.1))
+                    .background(ColorTokens.surfaceFocused)
                     .cornerRadius(10)
                     .frame(maxWidth: 700)
                 }
@@ -56,43 +56,17 @@ struct SearchView: View {
                 .padding(.vertical, 25)
                 
                 Divider()
-                    .background(Color.white.opacity(0.2))
+                    .background(ColorTokens.divider)
                     .padding(.horizontal, 90)
                 
                 // Search Results
                 if viewModel.isSearching {
-                    VStack {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(1.5)
-                        Text("搜索中...")
-                            .font(.system(size: 18))
-                            .foregroundColor(.gray)
-                            .padding(.top, 20)
-                    }
-                    .frame(height: 400)
+                    LoadingView("搜索中...")
+                        .frame(height: 400)
                 } else if viewModel.searchResults.isEmpty && !viewModel.searchQuery.isEmpty {
-                    VStack {
-                        Image(systemName: "film.stack")
-                            .font(.system(size: 60))
-                            .foregroundColor(.gray)
-                        Text("未找到相关内容")
-                            .font(.system(size: 20))
-                            .foregroundColor(.gray)
-                            .padding(.top, 15)
-                    }
-                    .frame(height: 400)
+                    EmptyStateView(icon: "film.stack", title: "未找到相关内容")
                 } else if viewModel.searchResults.isEmpty {
-                    VStack {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 80))
-                            .foregroundColor(.gray)
-                        Text("搜索电影或电视剧")
-                            .font(.title2)
-                            .foregroundColor(.gray)
-                            .padding(.top, 20)
-                    }
-                    .frame(height: 400)
+                    EmptyStateView(icon: "magnifyingglass", title: "搜索电影或电视剧")
                 } else {
                     LazyVGrid(
                         columns: [
@@ -116,7 +90,7 @@ struct SearchView: View {
                 }
             }
         }
-        .background(Color.black)
+        .background(ColorTokens.appBackground)
         .onAppear {
             // 只有在没有搜索结果时才自动聚焦搜索框
             if viewModel.searchResults.isEmpty {
@@ -190,7 +164,7 @@ struct SubscribeSheet: View {
                         if let overview = media.overview {
                             Text(overview)
                                 .font(.body)
-                                .foregroundColor(.gray)
+                                .foregroundColor(ColorTokens.textMuted)
                                 .lineLimit(5)
                         }
                         

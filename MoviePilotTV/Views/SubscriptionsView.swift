@@ -39,32 +39,15 @@ struct SubscriptionsView: View {
                     .padding(.vertical, 30)
                     
                     Divider()
-                        .background(Color.white.opacity(0.2))
+                        .background(ColorTokens.divider)
                         .padding(.horizontal, 90)
                     
                     // Content
                     if viewModel.isLoading {
-                        VStack {
-                            Spacer()
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                .scaleEffect(1.5)
-                            Spacer()
-                        }
-                        .frame(height: 400)
+                        LoadingView()
+                            .frame(height: 400)
                     } else if viewModel.filteredSubscriptions.isEmpty {
-                        VStack {
-                            Spacer()
-                            Image(systemName: "bookmark.slash")
-                            .font(.system(size: 80))
-                            .foregroundColor(.gray)
-                            Text("暂无订阅")
-                                .font(.title2)
-                                .foregroundColor(.gray)
-                                .padding(.top, 20)
-                            Spacer()
-                        }
-                        .frame(height: 400)
+                        EmptyStateView(icon: "bookmark.slash", title: "暂无订阅", subtitle: "去搜索页面添加订阅")
                     } else {
                         subscriptionCardsView()
                             .padding(.horizontal, 90)
@@ -104,7 +87,7 @@ struct SubscriptionsView: View {
                 .zIndex(100)
             }
         }
-        .background(Color.black)
+        .background(ColorTokens.appBackground)
         .onAppear {
             viewModel.loadSubscriptions()
             // 页面加载时不自动设置焦点，保持在 tab 导航上
@@ -143,7 +126,7 @@ struct SubscriptionsView: View {
     private func filterButton(for filter: SubscriptionFilter) -> some View {
         Text(filter.displayName)
             .font(.system(size: 24, weight: selectedFilter == filter ? .bold : .regular))
-            .foregroundColor(selectedFilter == filter ? .white : .gray)
+            .foregroundColor(selectedFilter == filter ? ColorTokens.textPrimary : ColorTokens.textMuted)
             .padding(.vertical, 4)
             .padding(.horizontal, 8)
             .background(
@@ -208,7 +191,7 @@ struct SubscriptionsView: View {
             }) {
                 SubscriptionCardContent(subscription: subscription)
             }
-            .buttonStyle(.card)
+            .buttonStyle(.cardButton)
             .focused($focusedCard, equals: String(subscription.id ?? 0))
             .onChange(of: focusedCard, initial: false) { oldValue, newValue in
                 if newValue == String(subscription.id ?? 0) {
@@ -244,7 +227,7 @@ struct SubscriptionCardContent: View {
             // Poster
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white.opacity(0.05))
+                    .fill(ColorTokens.surfaceCard)
                 if let posterURL = subscription.posterURL {
                     CachedAsyncImage(url: posterURL) { phase in
                         switch phase {
@@ -291,7 +274,7 @@ struct SubscriptionCardContent: View {
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 3)
-                                .background(Color.blue.opacity(0.9))
+                                .background(ColorTokens.accent.opacity(0.9))
                                 .cornerRadius(6)
                         }
                     }
@@ -302,16 +285,16 @@ struct SubscriptionCardContent: View {
             
             // Title
             Text(subscription.name ?? "未知")
-                .font(.system(size: 19, weight: .medium))
-                .foregroundColor(.white)
+                .font(FontTokens.cardTitle)
+                .foregroundColor(ColorTokens.textPrimary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
-            
+
             // Year
             if let year = subscription.year {
                 Text(year)
-                    .font(.system(size: 15))
-                    .foregroundColor(.gray)
+                    .font(FontTokens.cardSubtitle)
+                    .foregroundColor(ColorTokens.textMuted)
                     .multilineTextAlignment(.center)
             }
         }
@@ -370,7 +353,7 @@ struct SubscriptionContextMenu: View {
                         .background(Color.blue.opacity(0.6))
                         .cornerRadius(8)
                     }
-                    .buttonStyle(.card)
+                    .buttonStyle(.cardButton)
                     .focused($focusedButton, equals: .search)
                     
                     Button(action: onDelete) {
@@ -384,7 +367,7 @@ struct SubscriptionContextMenu: View {
                         .background(Color.red.opacity(0.2))
                         .cornerRadius(8)
                     }
-                    .buttonStyle(.card)
+                    .buttonStyle(.cardButton)
                     .focused($focusedButton, equals: .delete)
                 }
                 
@@ -396,7 +379,7 @@ struct SubscriptionContextMenu: View {
                         .background(Color.white.opacity(0.1))
                         .cornerRadius(8)
                 }
-                .buttonStyle(.card)
+                .buttonStyle(.cardButton)
                 .focused($focusedButton, equals: .cancel)
             }
             .padding(30)

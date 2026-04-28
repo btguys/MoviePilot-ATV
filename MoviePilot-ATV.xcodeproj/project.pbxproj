@@ -46,6 +46,12 @@
 		7864CAB32F21DF2900B507F8 /* CategoryMoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7864CAB22F21DF2900B507F8 /* CategoryMoreView.swift */; };
 		7864CAB52F21DF3C00B507F8 /* CategoryMoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7864CAB42F21DF3C00B507F8 /* CategoryMoreViewModel.swift */; };
 		B1CB0004D7BB78A24D3C8DB9 /* WebSocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBFD805634BCB59C67C7169 /* WebSocketService.swift */; };
+		F0010002 /* FontTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0010001 /* FontTokens.swift */; };
+		C0010002 /* ColorTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010001 /* ColorTokens.swift */; };
+		L0010002 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = L0010001 /* LoadingView.swift */; };
+		E0010002 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0010001 /* EmptyStateView.swift */; };
+			S0010002 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = S0010001 /* SettingsView.swift */; };
+			B0010002 /* CardButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010001 /* CardButtonStyle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,6 +121,12 @@
 		7864CAB42F21DF3C00B507F8 /* CategoryMoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryMoreViewModel.swift; sourceTree = "<group>"; };
 		A6269B6741F747DF8307FD41 /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
 		BEBFD805634BCB59C67C7169 /* WebSocketService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WebSocketService.swift; sourceTree = "<group>"; };
+		F0010001 /* FontTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontTokens.swift; sourceTree = "<group>"; };
+		C0010001 /* ColorTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTokens.swift; sourceTree = "<group>"; };
+		L0010001 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		E0010001 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		S0010001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B0010001 /* CardButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardButtonStyle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -153,6 +165,8 @@
 		0BCD796AC80A442DBFFE40B5 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				F0010001 /* FontTokens.swift */,
+				C0010001 /* ColorTokens.swift */,
 				7864CA802F18D83600B507F8 /* TopShelfHelper.swift */,
 				524A7BE6880142EEB9AA626A /* ImageLoader.swift */,
 				053F36E54E0D48FCA9F8821B /* ImageCache.swift */,
@@ -200,6 +214,8 @@
 			children = (
 				7864CAB22F21DF2900B507F8 /* CategoryMoreView.swift */,
 				780172E32F0779AE00C7EAF0 /* SystemStatusCard.swift */,
+				S0010001 /* SettingsView.swift */,
+				B0010001 /* CardButtonStyle.swift */,
 				4A0006 /* LoginView.swift */,
 				4A0008 /* MainView.swift */,
 				4A000A /* HomeView.swift */,
@@ -258,6 +274,8 @@
 		70761D26A8694527860EF25F /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				L0010001 /* LoadingView.swift */,
+				E0010001 /* EmptyStateView.swift */,
 				A6269B6741F747DF8307FD41 /* CachedAsyncImage.swift */,
 			);
 			path = Components;
@@ -411,6 +429,12 @@
 				37CD7D8D497B4CB4AFBFAFE0 /* ImageCache.swift in Sources */,
 				23B469F6E94D4A5E9748CEDD /* Credits.swift in Sources */,
 				B1CB0004D7BB78A24D3C8DB9 /* WebSocketService.swift in Sources */,
+			F0010002 /* FontTokens.swift in Sources */,
+			C0010002 /* ColorTokens.swift in Sources */,
+			L0010002 /* LoadingView.swift in Sources */,
+			E0010002 /* EmptyStateView.swift in Sources */,
+			S0010002 /* SettingsView.swift in Sources */,
+			B0010002 /* CardButtonStyle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -564,12 +588,10 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = MoviePilotTV/MoviePilotTV.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=appletvos*]" = GZBG3L22Y5;
+				DEVELOPMENT_TEAM = GZBG3L22Y5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoviePilotTV/Info.plist;
@@ -586,7 +608,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.hvg.moviepilot-atv";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "Movie Pilot ATV";
 				SDKROOT = appletvos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -606,12 +627,10 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = MoviePilotTV/MoviePilotTV.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=appletvos*]" = GZBG3L22Y5;
+				DEVELOPMENT_TEAM = GZBG3L22Y5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoviePilotTV/Info.plist;
@@ -628,7 +647,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.hvg.moviepilot-atv";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "Movie Pilot ATV";
 				SDKROOT = appletvos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
 				SUPPORTS_MACCATALYST = NO;
