@@ -55,7 +55,7 @@
 
 1. **打开项目**
    ```bash
-   cd /Users/ykyau/xcode/MoviePoilt-TV
+   cd MoviePilot-ATV
    open MoviePilotTV.xcodeproj
    ```
 
