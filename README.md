@@ -52,7 +52,7 @@
 - 查看下载器速度、上传/下载量
 
 ### 站点管理
-- 查看 BT 站点列表
+- 查看站点列表
 - 启用/停用站点
 - 查看站点用户数据
 
@@ -180,15 +180,6 @@ Top Shelf：主屏幕推荐内容 + Deep Linking (moviepilot://)
 - **LoadingView** / **EmptyStateView**：通用加载和空状态组件
 - **CardButtonStyle**：统一卡片焦点动画样式
 
-## 字体规范（tvOS 优化）
-
-| 元素 | 字体大小 |
-|------|---------|
-| 页面标题 | 32px |
-| 分类标题 | 26-28px |
-| 导航按钮 | 18px |
-| 卡片标题 | 16px |
-| 辅助信息 | 13-16px |
 
 ## 测试与诊断
 
@@ -388,7 +379,7 @@ MoviePilotTV/
 
 ## 许可证
 
-本项目采用 Apache 2.0 许可证。详见 LICENSE 文件。
+本项目采用 GNU General Public License v3.0 (GPL-3.0)。详见 LICENSE 文件。
 
 ## 相关链接
 
