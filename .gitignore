@@ -1,0 +1,7 @@
+build/
+*.xcuserdata/
+*.xcuserstate
+*.backup
+*.backup2
+.DS_Store
+*.mobileprovision
